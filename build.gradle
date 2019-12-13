@@ -8,8 +8,6 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven'
 
-group = 'com.ride2go'
-version = '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 8
 targetCompatibility = 8
