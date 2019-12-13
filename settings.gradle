@@ -1,0 +1,8 @@
+pluginManagement {
+	repositories {
+		gradlePluginPortal()
+        jcenter()
+        mavenCentral()
+	}
+}
+rootProject.name = 'share-square-hub'
