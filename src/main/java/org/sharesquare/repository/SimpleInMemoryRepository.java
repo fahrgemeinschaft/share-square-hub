@@ -1,23 +1,23 @@
 package org.sharesquare.repository;
 
-import org.sharesquare.ShareSquareObject;
+import org.sharesquare.IShareSquareObject;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.HashMap;
 
 @Service
-public class SimpleInMemoryRepository<T extends ShareSquareObject> implements IRepository<T> {
+public class SimpleInMemoryRepository<T extends IShareSquareObject> implements IRepository<T> {
     HashMap<String, T> inMemData = new HashMap<>();
 
     @Override
     public T create(T data) {
-        return inMemData.put(data.getId(), data);
+        return inMemData.put(data.getId().toString(), data);
     }
 
     @Override
     public T update(T data) {
-        return inMemData.replace(data.getId(),data);
+        return inMemData.replace(data.getId().toString(),data);
     }
 
     @Override

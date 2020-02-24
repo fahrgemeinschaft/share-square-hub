@@ -1,8 +1,10 @@
 package org.sharesquare.hub.configuration;
 
 import lombok.Data;
+import org.sharesquare.commons.sanity.OfferSanitizer;
 import org.sharesquare.model.Offer;
 import org.sharesquare.repository.SimpleInMemoryRepository;
+import org.sharesquare.sanity.IShareSquareSanitizer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,5 +24,10 @@ public class SystemConfiguration {
     @Bean
     SimpleInMemoryRepository<Offer> createOfferRepo(){
         return new SimpleInMemoryRepository<Offer>();
+    }
+
+    @Bean
+    IShareSquareSanitizer<Offer> createOfferSanitizer(){
+        return new OfferSanitizer();
     }
 }

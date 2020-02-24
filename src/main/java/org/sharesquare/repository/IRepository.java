@@ -1,10 +1,10 @@
 package org.sharesquare.repository;
 
-import org.sharesquare.ShareSquareObject;
+import org.sharesquare.IShareSquareObject;
 
 import java.util.Collection;
 
-public interface IRepository<T extends ShareSquareObject> {
+public interface IRepository<T extends IShareSquareObject> {
 
     T create(T data);
 

@@ -1,10 +1,12 @@
 package org.sharesquare.hub.endpoints;
 
 
+import org.sharesquare.commons.sanity.OfferSanitizer;
 import org.sharesquare.model.Offer;
-import org.sharesquare.hub.sanity.OfferSanitizer;
+
 
 import org.sharesquare.repository.SimpleInMemoryRepository;
+import org.sharesquare.sanity.IShareSquareSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +18,7 @@ import java.util.List;
 public class Offers {
 
     @Autowired
-    private OfferSanitizer offerSanitizer;
+    private IShareSquareSanitizer<Offer> offerSanitizer;
 
     @Autowired
     private SimpleInMemoryRepository<Offer> offerRepository;
@@ -24,7 +26,7 @@ public class Offers {
 
     @GetMapping(path="/offers/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> getById(@PathVariable final String id){
-        if(offerSanitizer.sanitizeId(id)) {
+        if(offerSanitizer.isIdValid(id)) {
             final Offer offer = offerRepository.findById(id);
 
             return ResponseEntity.ok().body(offer);
