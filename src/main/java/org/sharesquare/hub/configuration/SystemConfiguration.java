@@ -3,6 +3,7 @@ package org.sharesquare.hub.configuration;
 import lombok.Data;
 import org.sharesquare.commons.sanity.OfferSanitizer;
 import org.sharesquare.model.Offer;
+import org.sharesquare.model.TargetSystem;
 import org.sharesquare.repository.SimpleInMemoryRepository;
 import org.sharesquare.sanity.IShareSquareSanitizer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,6 +21,11 @@ public class SystemConfiguration {
 
     private String appName;
 
+
+    @Bean
+    SimpleInMemoryRepository<TargetSystem> createTargetSystemRepo(){
+        return new SimpleInMemoryRepository<TargetSystem>();
+    }
 
     @Bean
     SimpleInMemoryRepository<Offer> createOfferRepo(){
