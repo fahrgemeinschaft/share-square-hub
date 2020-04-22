@@ -8,18 +8,26 @@ import org.sharesquare.hub.service.OfferService;
 import org.sharesquare.model.Offer;
 import org.sharesquare.repository.IRepository;
 import org.sharesquare.sanity.IShareSquareSanitizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.Optional;
 
 @RestController
 public class Offers {
+	
+    private static final Logger log = LoggerFactory.getLogger(Offers.class);
 
     @Autowired
     private IShareSquareSanitizer<Offer> offerSanitizer;
@@ -78,8 +86,15 @@ public class Offers {
     }
 
     @GetMapping(path = "/offers",produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<Offer>> findMany(@RequestParam final Offer search, @RequestParam(required = false) final Pageable page){
-        return ResponseEntity.ok(offerRepository.findMany(search, page));
+    public ResponseEntity<Page<Offer>> findMany(@RequestParam final String search,
+    		@PageableDefault(page = 0, size = 50) final Pageable pageable) {
+		try {
+			Offer searchOffer = new ObjectMapper().readValue(search, Offer.class);
+			return ResponseEntity.ok(offerRepository.findMany(searchOffer, pageable));
+		} catch (JsonProcessingException e) {
+			log.info("Cannot convert user search to offer object: ", e);
+		}
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @Operation(description = "Delete an Offer")
