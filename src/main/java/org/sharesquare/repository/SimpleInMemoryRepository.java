@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,17 +19,24 @@ public class SimpleInMemoryRepository<T extends IShareSquareObject> implements I
 
     @Override
     public Optional<T> create(T data) {
+        data.setId(UUID.randomUUID());
         return Optional.ofNullable(inMemData.put(data.getId().toString(), data));
     }
 
     @Override
     public Optional<T> update(T data) {
-        return Optional.ofNullable(inMemData.replace(data.getId().toString(),data));
+    	if (data.getId() != null) {
+    		return Optional.ofNullable(inMemData.replace(data.getId().toString(),data));
+    	}
+    	return Optional.empty();
     }
 
     @Override
     public Optional<T> delete(T data) {
-        return Optional.ofNullable(inMemData.remove(data.getId()));
+    	if (data.getId() != null) {
+    		return Optional.ofNullable(inMemData.remove(data.getId().toString()));
+    	}
+    	return Optional.empty();
     }
 
     @Override
