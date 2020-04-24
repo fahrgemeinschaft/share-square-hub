@@ -20,7 +20,8 @@ public class SimpleInMemoryRepository<T extends IShareSquareObject> implements I
     @Override
     public Optional<T> create(T data) {
         data.setId(UUID.randomUUID());
-        return Optional.ofNullable(inMemData.put(data.getId().toString(), data));
+        inMemData.put(data.getId().toString(), data);
+        return Optional.ofNullable(inMemData.get(data.getId().toString()));
     }
 
     @Override
