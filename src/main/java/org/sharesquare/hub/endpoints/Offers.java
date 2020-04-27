@@ -57,14 +57,14 @@ public class Offers {
     }
 
     @Operation(description = "Create an Offer")
-    @ApiResponse(description = "Successful operation", responseCode = "202")
-    @ApiResponse(description = "Malformed Data", responseCode = "422", content = @Content)
+    @ApiResponse(responseCode = "201", description = "Success")
+    @ApiResponse(responseCode = "415", description = "Wrong format/data", content = @Content)
     @PostMapping(path = "/offers", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> createOffer(@RequestBody Offer offer){
 
         final Optional<Offer> result = offerRepository.create(offer);
         if(result.isPresent()) {
-            return ResponseEntity.accepted().body(result.get());
+        	return new ResponseEntity<Offer>(result.get(), HttpStatus.CREATED);
         }else{
             return ResponseEntity.unprocessableEntity().build();
         }
