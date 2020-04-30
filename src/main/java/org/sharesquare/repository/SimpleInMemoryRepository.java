@@ -7,15 +7,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @Service
 public class SimpleInMemoryRepository<T extends IShareSquareObject> implements IRepository<T> {
-    HashMap<String, T> inMemData = new HashMap<>();
+    ConcurrentMap<String, T> inMemData = new ConcurrentHashMap<>();
 
     @Override
     public Optional<T> create(T data) {
