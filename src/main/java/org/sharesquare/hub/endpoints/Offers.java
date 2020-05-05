@@ -65,7 +65,8 @@ public class Offers {
 
     @Operation(description = "Create an Offer")
     @ApiResponse(responseCode = "201", description = "Success")
-    @ApiResponse(responseCode = "415", description = "Wrong format/data", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
+    @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
     @PostMapping(path = "/offers", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> createOffer(@Valid @RequestBody Offer offer) {
 
