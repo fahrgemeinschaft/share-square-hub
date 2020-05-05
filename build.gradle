@@ -69,7 +69,6 @@ dependencies {
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.2.5.RELEASE'
 
-    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
