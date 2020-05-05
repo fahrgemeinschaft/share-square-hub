@@ -2,6 +2,7 @@ package org.sharesquare.hub.endpoints
 
 import static groovy.json.JsonOutput.toJson
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
+import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE
 import static org.springframework.http.MediaType.APPLICATION_JSON
@@ -67,7 +68,7 @@ class OfferPostRequestTest extends Specification {
 			responseOffer == offer
 	}
 
-	def "A post request with an empty body should respond with status code 415 and a meaningful error message"() {
+	def "A post request with an empty body should respond with status code 400 and a meaningful error message"() {
 		given:
 			final emptyRequestBody = ''
 
@@ -76,7 +77,7 @@ class OfferPostRequestTest extends Specification {
 
 		then:
 			with (response) {
-				status                      == UNSUPPORTED_MEDIA_TYPE.value
+				status                      == BAD_REQUEST.value
 				errorMessage                == null
 				headers[CONTENT_TYPE].value == APPLICATION_JSON_VALUE
 				contentType                 == APPLICATION_JSON_VALUE
@@ -87,14 +88,14 @@ class OfferPostRequestTest extends Specification {
 
 		then:
 			with (responseError) {
-				status  == UNSUPPORTED_MEDIA_TYPE.value
-				error   == UNSUPPORTED_MEDIA_TYPE.reasonPhrase
+				status  == BAD_REQUEST.value
+				error   == BAD_REQUEST.reasonPhrase
 				message == 'Required request body for Offer is missing'
 				path    == uri
 			}
 	}
 
-	def "A post request with invalid JSON should respond with status code 415 and a meaningful error message"() {
+	def "A post request with invalid JSON should respond with status code 400 and a meaningful error message"() {
 		given:
 			final invalidJson = '{.'
 
@@ -103,7 +104,7 @@ class OfferPostRequestTest extends Specification {
 
 		then:
 			with (response) {
-				status                      == UNSUPPORTED_MEDIA_TYPE.value
+				status                      == BAD_REQUEST.value
 				errorMessage                == null
 				headers[CONTENT_TYPE].value == APPLICATION_JSON_VALUE
 				contentType                 == APPLICATION_JSON_VALUE
@@ -114,14 +115,14 @@ class OfferPostRequestTest extends Specification {
 
 		then:
 			with (responseError) {
-				status  == UNSUPPORTED_MEDIA_TYPE.value
-				error   == UNSUPPORTED_MEDIA_TYPE.reasonPhrase
-				message.startsWith('Invalid request body for Offer. Could not parse JSON: Unexpected character')
+				status  == BAD_REQUEST.value
+				error   == BAD_REQUEST.reasonPhrase
+				message == "Invalid request body for Offer. JSON parse error: Unexpected character ('.' (code 46)): was expecting double-quote to start field name"
 				path    == uri
 			}
 	}
 
-	def "A post request with a wrong field type in the body should respond with status code 415 and a meaningful error message"() {
+	def "A post request with a wrong field type in the body should respond with status code 400 and a meaningful error message"() {
 		given:
 			final invalidOffer = [userId: []]
 
@@ -130,7 +131,7 @@ class OfferPostRequestTest extends Specification {
 
 		then:
 			with (response) {
-				status                      == UNSUPPORTED_MEDIA_TYPE.value
+				status                      == BAD_REQUEST.value
 				errorMessage                == null
 				headers[CONTENT_TYPE].value == APPLICATION_JSON_VALUE
 				contentType                 == APPLICATION_JSON_VALUE
@@ -141,11 +142,9 @@ class OfferPostRequestTest extends Specification {
 
 		then:
 			with (responseError) {
-				status  == UNSUPPORTED_MEDIA_TYPE.value
-				error   == UNSUPPORTED_MEDIA_TYPE.reasonPhrase
-				// depending on spring boot version
-				(message.startsWith('JSON parse error: Cannot deserialize instance of')
-					|| message.startsWith('Invalid JSON input: Cannot deserialize instance of'))
+				status  == BAD_REQUEST.value
+				error   == BAD_REQUEST.reasonPhrase
+				message == "Invalid JSON input for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token"
 				path    == uri
 			}
 	}
