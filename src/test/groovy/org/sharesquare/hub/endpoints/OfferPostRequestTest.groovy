@@ -144,7 +144,9 @@ class OfferPostRequestTest extends Specification {
 			with (responseError) {
 				status  == BAD_REQUEST.value
 				error   == BAD_REQUEST.reasonPhrase
-				message == "Invalid JSON input for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token"
+				// depending on spring boot version
+				(message == "Invalid JSON input for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token"
+				|| message == "JSON parse error for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token")
 				path    == uri
 			}
 	}

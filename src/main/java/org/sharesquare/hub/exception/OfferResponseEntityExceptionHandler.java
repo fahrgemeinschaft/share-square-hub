@@ -36,9 +36,11 @@ public class OfferResponseEntityExceptionHandler {
 	public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, WebRequest request) {
 		String message = ex.getMessage();
 		if (ex.getCause() instanceof MismatchedInputException) {
-			if (message.startsWith(JSON_INVALID_PROBLEM)) {
+			if (message.startsWith(JSON_INVALID_PROBLEM)
+					|| message.startsWith(JSON_PARSE_ERROR)) {
 				MismatchedInputException cause = (MismatchedInputException) ex.getCause();
-				message = String.format("%s for Offer", JSON_INVALID_PROBLEM);
+				message = message.startsWith(JSON_INVALID_PROBLEM) ? JSON_INVALID_PROBLEM : JSON_PARSE_ERROR;
+				message += " for Offer";
 				if (!CollectionUtils.isEmpty(cause.getPath())) {
 					message += String.format(" in field '%s'", cause.getPath().get(0).getFieldName());
 				}
