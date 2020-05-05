@@ -11,5 +11,7 @@ public final class ErrorMessage {
 
 	public static final String OFFER_IS_EMPTY = "Required request body for Offer is missing";
 
-	public static final String JSON_PARSE_PROBLEM = "Could not parse JSON";
+	public static final String JSON_PARSE_ERROR = "JSON parse error";
+
+	public static final String JSON_INVALID_PROBLEM = "Invalid JSON input";
 }
