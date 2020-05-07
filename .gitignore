@@ -19,3 +19,9 @@ hs_err_pid*
 build/
 out/
 local.properties
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/

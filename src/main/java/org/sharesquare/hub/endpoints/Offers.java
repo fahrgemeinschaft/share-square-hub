@@ -4,6 +4,8 @@ package org.sharesquare.hub.endpoints;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import org.sharesquare.hub.exception.OfferCreationProblem;
 import org.sharesquare.hub.service.OfferService;
 import org.sharesquare.model.Offer;
 import org.sharesquare.repository.IRepository;
@@ -24,6 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 @RestController
 public class Offers {
 	
@@ -38,6 +42,9 @@ public class Offers {
 
     @Autowired
     private IRepository<Offer> offerRepository;
+    
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Operation(description = "Returns the offer with the given ID")
     @ApiResponse(description = "Successful operation", responseCode = "200")
@@ -57,16 +64,25 @@ public class Offers {
     }
 
     @Operation(description = "Create an Offer")
-    @ApiResponse(description = "Successful operation", responseCode = "202")
-    @ApiResponse(description = "Malformed Data", responseCode = "422", content = @Content)
+    @ApiResponse(responseCode = "201", description = "Success")
+    @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
+    @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
     @PostMapping(path = "/offers", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> createOffer(@RequestBody Offer offer){
+    public ResponseEntity<Offer> createOffer(@Valid @RequestBody Offer offer) {
 
         final Optional<Offer> result = offerRepository.create(offer);
         if(result.isPresent()) {
-            return ResponseEntity.accepted().body(result.get());
+        	return new ResponseEntity<>(result.get(), HttpStatus.CREATED);
         }else{
-            return ResponseEntity.unprocessableEntity().build();
+        	// should not be reached
+        	String message = "There was an unexpected problem while creating the Offer: ";
+			try {
+				message += objectMapper.writeValueAsString(offer);
+			} catch (JsonProcessingException e) {
+				log.warn("JSON processing problem: " + e.getMessage());
+			}
+        	log.error(message);
+        	throw new OfferCreationProblem(message);
         }
     }
 
@@ -89,7 +105,7 @@ public class Offers {
     public ResponseEntity<Page<Offer>> findMany(@RequestParam final String search,
     		@PageableDefault(page = 0, size = 50) final Pageable pageable) {
 		try {
-			Offer searchOffer = new ObjectMapper().readValue(search, Offer.class);
+			Offer searchOffer = objectMapper.readValue(search, Offer.class);
 			return ResponseEntity.ok(offerRepository.findMany(searchOffer, pageable));
 		} catch (JsonProcessingException e) {
 			log.info("Cannot convert user search to offer object: ", e);
