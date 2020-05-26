@@ -3,6 +3,8 @@ package org.sharesquare.hub.exception;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
@@ -26,9 +28,18 @@ public class ResponseError {
 	private String path;
 
 	public ResponseError(HttpStatus status, String message, WebRequest request) {
+		setValues(status, message);
+		this.path = ((ServletWebRequest) request).getRequest().getRequestURI();
+	}
+
+	public ResponseError(HttpStatus status, String message, HttpServletRequest request) {
+		setValues(status, message);
+		this.path = request.getRequestURI();
+	}
+
+	private void setValues(HttpStatus status, String message) {
 		this.status = status.value();
 		this.error = status.getReasonPhrase();
 		this.message = message;
-		this.path = ((ServletWebRequest) request).getRequest().getRequestURI();
 	}
 }
