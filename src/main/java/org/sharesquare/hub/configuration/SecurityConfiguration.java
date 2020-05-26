@@ -3,14 +3,25 @@ package org.sharesquare.hub.configuration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.sharesquare.commons.web.security.oauth.resourceserver.KeycloakRealmRoleConverter;
+import org.sharesquare.hub.exception.RestAccessDeniedHandler;
+import org.sharesquare.hub.exception.RestAuthenticationEntryPoint;
+import org.sharesquare.hub.exception.RestAuthenticationFailureHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 
 @EnableWebSecurity
 @Configuration
@@ -39,13 +50,63 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${SHARE2_USER_ID_CLAIM:user_id}")
     private String userIdClaim;
 
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests()
-                .anyRequest().permitAll();
+	@Value("${auth.server.scope}")
+	private String scope;
 
+	@Value("${auth.server.issuer.uri}")
+	private String issuerUri;
+
+	private static final String SCOPE_PREFIX = "SCOPE_";
+
+	@Bean
+	public JwtDecoder JwtDecoder() {
+		return JwtDecoders.fromIssuerLocation(issuerUri);
+	}
+
+	@Bean
+	RestAccessDeniedHandler accessDeniedHandler() {
+		return new RestAccessDeniedHandler();
+	}
+
+	@Bean
+	RestAuthenticationEntryPoint authenticationEntryPoint() {
+		return new RestAuthenticationEntryPoint();
+	}
+
+	@Bean
+	RestAuthenticationFailureHandler authenticationFailureHandler() {
+		return new RestAuthenticationFailureHandler();
+	}
+
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	@Autowired
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		// do NOT call super.configure()
+	}
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+			.csrf(csrf -> csrf.disable())
+			.authorizeRequests(authorize -> authorize
+				.mvcMatchers("/offers/**").hasAuthority(SCOPE_PREFIX + scope)
+				.anyRequest().authenticated()
+			)
+			.exceptionHandling()
+				.accessDeniedHandler(accessDeniedHandler())
+				.authenticationEntryPoint(authenticationEntryPoint()).and()
+			.sessionManagement(cust -> cust.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+
+		BearerTokenAuthenticationFilter filter = new BearerTokenAuthenticationFilter(authenticationManagerBean());
+		filter.setAuthenticationFailureHandler(authenticationFailureHandler());
+		http.addFilterBefore(filter, BearerTokenAuthenticationFilter.class);
     }
         /*
         http
