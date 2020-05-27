@@ -64,6 +64,7 @@ class AuthTest extends RequestSpecification {
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
+			responseError.message = responseError.message.replaceFirst(/ token [^ ]* at /, ' token  at ')
 
 		then:
 			resultContentIs(responseError, UNAUTHORIZED, jwtError + errorDetail)
@@ -72,20 +73,20 @@ class AuthTest extends RequestSpecification {
 			invalid                                 | errorDetail
 			'a.b.c'                                 | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected token  at position 0.'
 			'.'                                     | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected token  at position 0.'
-			'a1.b.c.d'                              | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected token k at position 1.'
-			'a2a.b'                                 | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected token kf at position 2.'
+			'a1.b.c.d'                              | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected token  at position 1.'
+			'a2a.b'                                 | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected token  at position 2.'
 			'eyJ.eyJ.123'                           | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected End Of File position 2: null'
 			'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.' | 'Invalid serialized unsecured/JWS/JWE object: Missing second delimiter'
 			'0'                                     | 'Invalid JWT serialization: Missing dot delimiter(s)'
 
 			"X$token"                               | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected character (]) at position 0.'
 			"$token.$token"                         | 'Invalid serialized unsecured/JWS/JWE object: Too many part delimiters'
-			"e$token"                               | 'Invalid token'
+			"e$token"                               | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected token  at position 72.'
 			"$token."                               | 'Invalid serialized JWE object: Missing fourth delimiter'
 			"${token}3"                             | 'Signed JWT rejected: Invalid signature'
 			"$token$token"                          | 'Unexpected number of Base64URL parts, must be three'
 
-			"${token.replaceFirst(/\./, '')}"       | 'Invalid token'
+			"${token.replaceFirst(/\./, '')}"       | 'Invalid unsecured/JWS/JWE header: Invalid JSON: Unexpected token  at position 83.'
 			"${token.replaceFirst(/\./, '..')}"     | 'Invalid serialized JWE object: Missing fourth delimiter'
 			"${token.replaceFirst(/\./, '.X')}"     | 'Malformed payload'
 	}
