@@ -1,41 +1,17 @@
 package org.sharesquare.hub.endpoints
 
-import static groovy.json.JsonOutput.toJson
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE
-import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import static org.springframework.http.MediaType.TEXT_XML
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 
 import org.sharesquare.model.Offer
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.test.web.servlet.MockMvc
-
-import com.fasterxml.jackson.databind.ObjectMapper
 
 import spock.lang.Issue
-import spock.lang.Specification
 
-@AutoConfigureMockMvc
-@WebMvcTest
-class OfferPostRequestTest extends Specification {
+class OfferPostRequestTest extends RequestSpecification {
 
-	@Autowired
-	private MockMvc mvc
-
-	@Autowired
-	ObjectMapper objectMapper
-
-	static final uri = '/offers'
-	
 	static final userId = 'userId'
 
 	@Issue("#4")
@@ -44,15 +20,12 @@ class OfferPostRequestTest extends Specification {
 			def offer = new Offer(userId: '1')
 
 		when:
+			// StackOverflowError when using groovy.json.JsonOutput.toJson with java.time.ZoneId
+			// https://issues.apache.org/jira/browse/GROOVY-7682
 			final response = doPost(toJson(offer))
 
 		then:
-			with (response) {
-				status                      == CREATED.value
-				errorMessage                == null
-				headers[CONTENT_TYPE].value == APPLICATION_JSON_VALUE
-				contentType                 == APPLICATION_JSON_VALUE
-		}
+			resultIs(response, CREATED)
 
 		when:
 			final responseOffer = fromJson(response.contentAsString)
@@ -76,23 +49,14 @@ class OfferPostRequestTest extends Specification {
 			final response = doPost(emptyRequestBody)
 
 		then:
-			with (response) {
-				status                      == BAD_REQUEST.value
-				errorMessage                == null
-				headers[CONTENT_TYPE].value == APPLICATION_JSON_VALUE
-				contentType                 == APPLICATION_JSON_VALUE
-		}
+			resultIs(response, BAD_REQUEST)
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
+			final expectedMessage = 'Required request body for Offer is missing'
 
 		then:
-			with (responseError) {
-				status  == BAD_REQUEST.value
-				error   == BAD_REQUEST.reasonPhrase
-				message == 'Required request body for Offer is missing'
-				path    == uri
-			}
+			resultContentIs(responseError, BAD_REQUEST, expectedMessage)
 	}
 
 	def "A post request with invalid JSON should respond with status code 400 and a meaningful error message"() {
@@ -103,23 +67,14 @@ class OfferPostRequestTest extends Specification {
 			final response = doPost(invalidJson)
 
 		then:
-			with (response) {
-				status                      == BAD_REQUEST.value
-				errorMessage                == null
-				headers[CONTENT_TYPE].value == APPLICATION_JSON_VALUE
-				contentType                 == APPLICATION_JSON_VALUE
-		}
+			resultIs(response, BAD_REQUEST)
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
+			final expectedMessage = "Invalid request body for Offer. JSON parse error: Unexpected character ('.' (code 46)): was expecting double-quote to start field name"
 
 		then:
-			with (responseError) {
-				status  == BAD_REQUEST.value
-				error   == BAD_REQUEST.reasonPhrase
-				message == "Invalid request body for Offer. JSON parse error: Unexpected character ('.' (code 46)): was expecting double-quote to start field name"
-				path    == uri
-			}
+			resultContentIs(responseError, BAD_REQUEST, expectedMessage)
 	}
 
 	def "A post request with a wrong field type in the body should respond with status code 400 and a meaningful error message"() {
@@ -130,25 +85,16 @@ class OfferPostRequestTest extends Specification {
 			final response = doPost(toJson(invalidOffer))
 
 		then:
-			with (response) {
-				status                      == BAD_REQUEST.value
-				errorMessage                == null
-				headers[CONTENT_TYPE].value == APPLICATION_JSON_VALUE
-				contentType                 == APPLICATION_JSON_VALUE
-		}
+			resultIs(response, BAD_REQUEST)
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			with (responseError) {
-				status  == BAD_REQUEST.value
-				error   == BAD_REQUEST.reasonPhrase
+			resultContentIs(responseError, BAD_REQUEST)
 				// depending on spring boot version
-				(message == "Invalid JSON input for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token"
-				|| message == "JSON parse error for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token")
-				path    == uri
-			}
+				(responseError.message == "Invalid JSON input for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token"
+				|| responseError.message == "JSON parse error for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token")
 	}
 
 	def "A post request with a not excepted content type should respond with status code 415 and a meaningful error message"() {
@@ -159,23 +105,14 @@ class OfferPostRequestTest extends Specification {
 			final response = doPost(offerAsXml, TEXT_XML)
 
 		then:
-			with (response) {
-				status                      == UNSUPPORTED_MEDIA_TYPE.value
-				errorMessage                == null
-				headers[CONTENT_TYPE].value == APPLICATION_JSON_VALUE
-				contentType                 == APPLICATION_JSON_VALUE
-		}
+			resultIs(response, UNSUPPORTED_MEDIA_TYPE)
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
+			final expectedMessage = "Content type 'text/xml' not supported"
 
 		then:
-			with (responseError) {
-				status  == UNSUPPORTED_MEDIA_TYPE.value
-				error   == UNSUPPORTED_MEDIA_TYPE.reasonPhrase
-				message == "Content type 'text/xml' not supported"
-				path    == uri
-			}
+			resultContentIs(responseError, UNSUPPORTED_MEDIA_TYPE, expectedMessage)
 	}
 
 	def "A post request with umlaut should work"() {
@@ -183,22 +120,10 @@ class OfferPostRequestTest extends Specification {
 			def offer = new Offer(userId: '\u00fc') // ue
 
 		when:
-			final response = mvc.perform(
-					post(uri)
-						.contentType(APPLICATION_JSON)
-						.content(toJson(offer))
-						.accept(APPLICATION_JSON_UTF8)
-				).andDo(print())
-				.andReturn()
-				.response
+			final response = doUTF8Post(toJson(offer))
 
 		then:
-			with (response) {
-				status                      == CREATED.value
-				errorMessage                == null
-				headers[CONTENT_TYPE].value == APPLICATION_JSON_UTF8_VALUE
-				contentType                 == APPLICATION_JSON_UTF8_VALUE
-		}
+			resultIs(response, CREATED, APPLICATION_JSON_UTF8_VALUE)
 
 		when:
 			final responseOffer = fromJson(response.contentAsString)
@@ -212,19 +137,5 @@ class OfferPostRequestTest extends Specification {
 
 		then:
 			responseOffer == offer
-	}
-
-	private def doPost(requestBody, mediaType = APPLICATION_JSON) {
-		mvc.perform(
-			post(uri)
-				.contentType(mediaType)
-				.content(requestBody)
-		).andDo(print())
-		.andReturn()
-		.response
-	}
-
-	private def fromJson(content, valueType = Offer) {
-		objectMapper.readValue(content, valueType)
 	}
 }

@@ -63,10 +63,12 @@ public class Offers {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
-    @Operation(description = "Create an Offer")
-    @ApiResponse(responseCode = "201", description = "Success")
-    @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
-    @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
+    @Operation(description = "Add a new Offer")
+    @ApiResponse(responseCode = "201", description = "Success", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Wrong data input")
+    @ApiResponse(responseCode = "415", description = "Wrong format")
+    @ApiResponse(responseCode = "401", description = "Wrong client authorization")
+    @ApiResponse(responseCode = "403", description = "Client not allowed")
     @PostMapping(path = "/offers", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> createOffer(@Valid @RequestBody Offer offer) {
 
