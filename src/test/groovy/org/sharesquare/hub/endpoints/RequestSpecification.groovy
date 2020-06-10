@@ -6,6 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 
@@ -46,8 +47,6 @@ class RequestSpecification extends Specification {
 	@Value("\${auth.server.client.not.in.scope.secret}")
 	private String clientNotInScopeSecret;
 
-	protected static final uri = '/offers'
-
 	private static final defaultOffer = '{}'
 
 	def authServerResponse(id = clientId, secret = clientSecret) {
@@ -66,7 +65,7 @@ class RequestSpecification extends Specification {
 		authServerResponse(clientNotInScopeId, clientNotInScopeSecret).data.access_token
 	}
 
-	def doPost(requestBody, mediaType = APPLICATION_JSON) {
+	def doPost(uri, requestBody, mediaType = APPLICATION_JSON) {
 		mvc.perform(
 				post(uri)
 					.header(AUTHORIZATION, "Bearer ${accessToken()}")
@@ -78,7 +77,7 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
-	def doUTF8Post(requestBody, mediaType = APPLICATION_JSON) {
+	def doUTF8Post(uri, requestBody, mediaType = APPLICATION_JSON) {
 		mvc.perform(
 				post(uri)
 					.header(AUTHORIZATION, "Bearer ${accessToken()}")
@@ -91,7 +90,7 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
-	def doPostWithAuthHeaderValue(value) {
+	def doPostWithAuthHeaderValue(uri, value) {
 		mvc.perform(
 				post(uri)
 					.header(AUTHORIZATION, value)
@@ -103,7 +102,7 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
-	def doPostWithAuthHeaderKey(key) {
+	def doPostWithAuthHeaderKey(uri, key) {
 		mvc.perform(
 				post(uri)
 					.header(key, "Bearer ${accessToken()}")
@@ -115,11 +114,21 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
-	def doPostWithoutAuthHeader() {
+	def doPostWithoutAuthHeader(uri) {
 		mvc.perform(
 				post(uri)
 					.contentType(APPLICATION_JSON)
 					.content(defaultOffer)
+			)
+			.andDo(print())
+			.andReturn()
+			.response
+	}
+
+	def doGet(uri) {
+		mvc.perform(
+				get(uri)
+					.header(AUTHORIZATION, "Bearer ${accessToken()}")
 			)
 			.andDo(print())
 			.andReturn()
@@ -143,7 +152,7 @@ class RequestSpecification extends Specification {
 		}
 	}
 
-	void resultContentIs(responseContent, httpStatus, expectedMessage = null) {
+	void resultContentIs(uri, responseContent, httpStatus, expectedMessage = null) {
 		with (responseContent) {
 			assert status == httpStatus.value
 			assert error  == httpStatus.reasonPhrase
