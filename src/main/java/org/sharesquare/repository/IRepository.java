@@ -18,6 +18,8 @@ public interface IRepository<T extends IShareSquareObject> {
 
     Optional<T> delete(T data);
 
+    public void deleteById(String id);
+
     Optional<T> findById(String id);
 
     Page<T> findMany(T searchData, Pageable pageable);
