@@ -47,7 +47,7 @@ sourceSets {
     }
     test {
         java {
-        	srcDirs= ['src/test/java']
+        	srcDirs= ['src/test/java','src/test/groovy']
         }
         resources {
         	srcDirs= ['src/test/resources']
@@ -86,6 +86,7 @@ dependencies {
     //testCompile group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.4.1'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.codehaus.groovy:groovy:3.0.4'
+	testImplementation 'org.codehaus.groovy:groovy-all:3.0.4'
 	testImplementation 'org.spockframework:spock-core:2.0-M3-groovy-3.0'
 	testImplementation 'org.spockframework:spock-spring:2.0-M3-groovy-3.0'
 	testImplementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
@@ -93,5 +94,6 @@ dependencies {
 }
 
 test {
+	useJUnitPlatform()
 	systemProperty 'com.athaydes.spockframework.report.showCodeBlocks', true
 }
