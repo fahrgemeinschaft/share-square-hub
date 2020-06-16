@@ -1,5 +1,6 @@
 package org.sharesquare.hub.endpoints
 
+import static org.sharesquare.hub.endpoints.OfferUtil.postUri
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpHeaders.WWW_AUTHENTICATE
 import static org.springframework.http.HttpStatus.FORBIDDEN
@@ -40,7 +41,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request without authorization header should respond with status code 401 and a meaningful error message"() {
 		when:
-			final response = doPostWithoutAuthHeader()
+			final response = doPostWithoutAuthHeader(postUri)
 
 		then:
 			resultIs(response, UNAUTHORIZED)
@@ -50,14 +51,14 @@ class AuthTest extends RequestSpecification {
 			final expectedMessage = 'Insufficient authentication: Full authentication is required to access this resource'
 
 		then:
-			resultContentIs(responseError, UNAUTHORIZED, expectedMessage)
+			resultContentIs(postUri, responseError, UNAUTHORIZED, expectedMessage)
 	}
 
 	static final jwtError = 'An error occurred while attempting to decode the Jwt: '
 
 	def "A request with an invalid access token should respond with status code 401 and a meaningful error message"() {
 		when:
-			final response = doPostWithAuthHeaderValue("Bearer $invalid")
+			final response = doPostWithAuthHeaderValue(postUri, "Bearer $invalid")
 
 		then:
 			resultIs(response, UNAUTHORIZED)
@@ -67,7 +68,7 @@ class AuthTest extends RequestSpecification {
 			responseError.message = responseError.message.replaceFirst(/ token [^ ]* at /, ' token  at ')
 
 		then:
-			resultContentIs(responseError, UNAUTHORIZED, jwtError + errorDetail)
+			resultContentIs(postUri, responseError, UNAUTHORIZED, jwtError + errorDetail)
 
 		where:
 			invalid                                 | errorDetail
@@ -95,7 +96,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request with a malformed or empty access token should respond with status code 401 and a meaningful error message in the response header"() {
 		when:
-			final response = doPostWithAuthHeaderValue("Bearer $malformed")
+			final response = doPostWithAuthHeaderValue(postUri, "Bearer $malformed")
 
 		then:
 			with (response) {
@@ -120,7 +121,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request with a malformed authorization header value should respond with status code 401 and a meaningful error message in the response header"() {
 		when:
-			final response = doPostWithAuthHeaderValue(value)
+			final response = doPostWithAuthHeaderValue(postUri, value)
 
 		then:
 			with (response) {
@@ -142,7 +143,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request with an invalid or empty authorization header value should respond with status code 401 and a meaningful error message"() {
 		when:
-			final response = doPostWithAuthHeaderValue(value)
+			final response = doPostWithAuthHeaderValue(postUri, value)
 
 		then:
 			resultIs(response, UNAUTHORIZED)
@@ -152,7 +153,7 @@ class AuthTest extends RequestSpecification {
 			final expectedMessage = 'Insufficient authentication: Full authentication is required to access this resource'
 
 		then:
-			resultContentIs(responseError, UNAUTHORIZED, expectedMessage)
+			resultContentIs(postUri, responseError, UNAUTHORIZED, expectedMessage)
 
 		where:
 			value            | _
@@ -166,7 +167,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request with an invalid or empty authorization header key should respond with status code 401 and a meaningful error message"() {
 		when:
-			final response = doPostWithAuthHeaderKey(key)
+			final response = doPostWithAuthHeaderKey(postUri, key)
 
 		then:
 			resultIs(response, UNAUTHORIZED)
@@ -176,7 +177,7 @@ class AuthTest extends RequestSpecification {
 			final expectedMessage = 'Insufficient authentication: Full authentication is required to access this resource'
 
 		then:
-			resultContentIs(responseError, UNAUTHORIZED, expectedMessage)
+			resultContentIs(postUri, responseError, UNAUTHORIZED, expectedMessage)
 
 		where:
 			key              | _
@@ -189,7 +190,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request with an expired access token should respond with status code 401 and a meaningful error message"() {
 		when:
-			def response = doPostWithAuthHeaderValue("Bearer $tokenExpired")
+			def response = doPostWithAuthHeaderValue(postUri, "Bearer $tokenExpired")
 
 		then:
 			resultIs(response, UNAUTHORIZED)
@@ -200,12 +201,12 @@ class AuthTest extends RequestSpecification {
 			final expectedMessage = 'An error occurred while attempting to decode the Jwt: Jwt expired at '
 
 		then:
-			resultContentIs(responseError, UNAUTHORIZED, expectedMessage)
+			resultContentIs(postUri, responseError, UNAUTHORIZED, expectedMessage)
 	}
 
 	def "A request with an access token not in the scope should respond with status code 403 and a meaningful error message"() {
 		when:
-			final response = doPostWithAuthHeaderValue("Bearer ${accessTokenNotInScope()}")
+			final response = doPostWithAuthHeaderValue(postUri, "Bearer ${accessTokenNotInScope()}")
 
 		then:
 			resultIs(response, FORBIDDEN)
@@ -214,6 +215,6 @@ class AuthTest extends RequestSpecification {
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			resultContentIs(responseError, FORBIDDEN, 'Access is denied')
+			resultContentIs(postUri, responseError, FORBIDDEN, 'Access is denied')
 	}
 }
