@@ -1,6 +1,9 @@
 package org.sharesquare.hub.endpoints;
 
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -120,10 +124,10 @@ public class Offers {
     @ApiResponse(description = "Malformed Data", responseCode = "422", content = @Content)
     @ApiResponse(description = "Entity Not Found", responseCode = "404", content = @Content)
     @DeleteMapping(path = "/offers/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> deleteOffer(@PathVariable final String id){
-
-        return ResponseEntity.ok().body(null);
+    public ResponseEntity<Void> deleteOffer(@PathVariable final UUID id) {
+    	if (offerService.deleteOffer(id)) {
+    		return new ResponseEntity<>(NO_CONTENT);
+    	}
+    	return new ResponseEntity<>(NOT_FOUND);
     }
-
 }
-
