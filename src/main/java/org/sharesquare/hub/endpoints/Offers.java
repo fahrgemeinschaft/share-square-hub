@@ -61,7 +61,7 @@ public class Offers {
         if(offerSanitizer.isIdValid(id)) {
             final Optional<Offer> offer = offerRepository.findById(id);
             if(offer.isPresent()) {
-                return ResponseEntity.ok().body(offer.get());
+                return ResponseEntity.ok(offer.get());
             }else{
                 return ResponseEntity.notFound().build();
             }
