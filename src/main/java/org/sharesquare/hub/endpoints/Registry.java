@@ -16,7 +16,7 @@ import java.util.Optional;
 @RestController
 public class Registry {
 
-	@Qualifier("createConnectorRepo")
+    @Qualifier("createConnectorRepo")
     @Autowired
     IRepository<Connector> connectorRepo;
 
