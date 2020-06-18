@@ -1,9 +1,9 @@
 package org.sharesquare.hub.endpoints;
 
 
-import org.sharesquare.model.Offer;
 import org.sharesquare.repository.IRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +16,7 @@ import java.util.Optional;
 @RestController
 public class Registry {
 
+	@Qualifier("createConnectorRepo")
     @Autowired
     IRepository<Connector> connectorRepo;
 
