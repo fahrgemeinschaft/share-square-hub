@@ -2,7 +2,6 @@ package org.sharesquare.hub.endpoints
 
 import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
 import static org.springframework.http.HttpStatus.BAD_REQUEST
-import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 
