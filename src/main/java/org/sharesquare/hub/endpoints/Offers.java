@@ -122,8 +122,7 @@ public class Offers {
     @Operation(description = "Delete an Offer")
     @ApiResponse(responseCode = "204", description = "No content success")
     @ApiResponse(responseCode = "404", description = "Offer doesn't exist")
-    @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid")
-    @ApiResponse(responseCode = "405", description = "Path variable Offer id is missing")
+    @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing")
     @DeleteMapping(path = "/offers/{id}")
     public ResponseEntity<Void> deleteOffer(@PathVariable final UUID id) {
     	if (offerService.deleteOffer(id)) {
