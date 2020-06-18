@@ -107,7 +107,8 @@ public class OfferResponseEntityExceptionHandler {
 		String message = ex.getMessage();
 		HttpStatus httpStatus = METHOD_NOT_ALLOWED;
 		HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
-		if (httpServletRequest.getMethod().equals("DELETE") && httpServletRequest.getRequestURI().equals("/offers/")) {
+		if (httpServletRequest.getMethod().equals("DELETE")
+				&& httpServletRequest.getRequestURI().equals("/offers/")) {
 			message = "Required path variable Offer id is missing";
 			httpStatus = BAD_REQUEST;
 		}
