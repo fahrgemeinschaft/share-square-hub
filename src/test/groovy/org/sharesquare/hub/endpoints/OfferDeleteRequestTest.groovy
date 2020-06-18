@@ -43,7 +43,7 @@ class OfferDeleteRequestTest extends RequestSpecification {
 		then:
 			resultContentIs("$offersUri/$uuid", responseError, BAD_REQUEST, expectedMessage)
 
-			where:
+		where:
 			uuid      | expectedMessage
 			'invalid' | "Type mismatch for path variable: Invalid UUID string: $uuid"
 			''        | 'Required path variable Offer id is missing'
