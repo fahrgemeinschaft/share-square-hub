@@ -31,10 +31,7 @@ class OfferDeleteRequestTest extends RequestSpecification {
 			response.status == NOT_FOUND.value
 	}
 
-	def "A delete request with an invalid UUID should respond with status code 400 and a meaningful error message"() {
-		given:
-			final uuid = 'invalid'
-
+	def "A delete request with an invalid UUID or an empty id should respond with status code 400 and a meaningful error message"() {
 		when:
 			final response = doDelete("$offersUri/$uuid")
 
@@ -43,27 +40,13 @@ class OfferDeleteRequestTest extends RequestSpecification {
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
-			final expectedMessage = "Type mismatch for path variable: Invalid UUID string: $uuid"
 
 		then:
 			resultContentIs("$offersUri/$uuid", responseError, BAD_REQUEST, expectedMessage)
-	}
 
-	def "A delete request with an empty id should respond with status code 405 and a meaningful error message"() {
-		given:
-			final uuid = ''
-
-		when:
-			final response = doDelete("$offersUri/$uuid")
-
-		then:
-			resultIs(response, METHOD_NOT_ALLOWED)
-
-		when:
-			final responseError = fromJson(response.contentAsString, Map)
-			final expectedMessage = "Request method 'DELETE' not supported"
-
-		then:
-			resultContentIs("$offersUri/$uuid", responseError, METHOD_NOT_ALLOWED, expectedMessage)
+			where:
+			uuid      | expectedMessage
+			'invalid' | "Type mismatch for path variable: Invalid UUID string: $uuid"
+			''        | 'Required path variable Offer id is missing'
 	}
 }

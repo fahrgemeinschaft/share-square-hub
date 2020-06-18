@@ -11,8 +11,11 @@ import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.CollectionUtils;
@@ -23,6 +26,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -100,7 +104,14 @@ public class OfferResponseEntityExceptionHandler {
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, WebRequest request) {
-		log.info("Wrong client request (http request method not supported): " + ex.getMessage());
-		return new ResponseEntity<>(new ResponseError(METHOD_NOT_ALLOWED, ex.getMessage(), request), METHOD_NOT_ALLOWED);
+		String message = ex.getMessage();
+		HttpStatus httpStatus = METHOD_NOT_ALLOWED;
+		HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
+		if (httpServletRequest.getMethod().equals("DELETE") && httpServletRequest.getRequestURI().equals("/offers/")) {
+			message = "Required path variable Offer id is missing";
+			httpStatus = BAD_REQUEST;
+		}
+		log.info("Wrong client request (http request method not supported): " + message);
+		return new ResponseEntity<>(new ResponseError(httpStatus, message, request), httpStatus);
 	}
 }
