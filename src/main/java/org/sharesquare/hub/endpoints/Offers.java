@@ -1,6 +1,9 @@
 package org.sharesquare.hub.endpoints;
 
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,9 +28,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
+@ApiResponse(responseCode = "401", description = "Wrong client authorization", content = @Content)
+@ApiResponse(responseCode = "403", description = "Client not allowed", content = @Content)
 @RestController
 public class Offers {
 	
@@ -55,7 +61,7 @@ public class Offers {
         if(offerSanitizer.isIdValid(id)) {
             final Optional<Offer> offer = offerRepository.findById(id);
             if(offer.isPresent()) {
-                return ResponseEntity.ok().body(offer.get());
+                return ResponseEntity.ok(offer.get());
             }else{
                 return ResponseEntity.notFound().build();
             }
@@ -64,11 +70,9 @@ public class Offers {
     }
 
     @Operation(description = "Add a new Offer")
-    @ApiResponse(responseCode = "201", description = "Success", content = @Content)
-    @ApiResponse(responseCode = "400", description = "Wrong data input")
-    @ApiResponse(responseCode = "415", description = "Wrong format")
-    @ApiResponse(responseCode = "401", description = "Wrong client authorization")
-    @ApiResponse(responseCode = "403", description = "Client not allowed")
+    @ApiResponse(responseCode = "201", description = "Success")
+    @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
+    @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
     @PostMapping(path = "/offers", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> createOffer(@Valid @RequestBody Offer offer) {
 
@@ -116,14 +120,14 @@ public class Offers {
     }
 
     @Operation(description = "Delete an Offer")
-    @ApiResponse(description = "Successful operation", responseCode = "200")
-    @ApiResponse(description = "Malformed Data", responseCode = "422", content = @Content)
-    @ApiResponse(description = "Entity Not Found", responseCode = "404", content = @Content)
-    @DeleteMapping(path = "/offers/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> deleteOffer(@PathVariable final String id){
-
-        return ResponseEntity.ok().body(null);
+    @ApiResponse(responseCode = "204", description = "No content success")
+    @ApiResponse(responseCode = "404", description = "Offer doesn't exist")
+    @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing")
+    @DeleteMapping(path = "/offers/{id}")
+    public ResponseEntity<Void> deleteOffer(@PathVariable final UUID id) {
+    	if (offerService.deleteOffer(id)) {
+    		return new ResponseEntity<>(NO_CONTENT);
+    	}
+    	return new ResponseEntity<>(NOT_FOUND);
     }
-
 }
-

@@ -6,6 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -47,7 +48,7 @@ class RequestSpecification extends Specification {
 	@Value("\${auth.server.client.not.in.scope.secret}")
 	private String clientNotInScopeSecret;
 
-	private static final defaultOffer = '{}'
+	static final defaultOffer = '{}'
 
 	def authServerResponse(id = clientId, secret = clientSecret) {
 		(new RESTClient(tokenUri))
@@ -128,6 +129,16 @@ class RequestSpecification extends Specification {
 	def doGet(uri) {
 		mvc.perform(
 				get(uri)
+					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+			)
+			.andDo(print())
+			.andReturn()
+			.response
+	}
+
+	def doDelete(uri) {
+		mvc.perform(
+				delete(uri)
 					.header(AUTHORIZATION, "Bearer ${accessToken()}")
 			)
 			.andDo(print())

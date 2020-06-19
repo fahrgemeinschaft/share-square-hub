@@ -1,6 +1,6 @@
 package org.sharesquare.hub.endpoints
 
-import static org.sharesquare.hub.endpoints.OfferUtil.postUri
+import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
 import static org.sharesquare.hub.endpoints.OfferUtil.userId
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.CREATED
@@ -22,7 +22,7 @@ class OfferPostRequestTest extends RequestSpecification {
 		when:
 			// StackOverflowError when using groovy.json.JsonOutput.toJson with java.time.ZoneId
 			// https://issues.apache.org/jira/browse/GROOVY-7682
-			final response = doPost(postUri, toJson(offer))
+			final response = doPost(offersUri, toJson(offer))
 
 		then:
 			resultIs(response, CREATED)
@@ -46,7 +46,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final emptyRequestBody = ''
 
 		when:
-			final response = doPost(postUri, emptyRequestBody)
+			final response = doPost(offersUri, emptyRequestBody)
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -56,7 +56,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final expectedMessage = 'Required request body for Offer is missing'
 
 		then:
-			resultContentIs(postUri, responseError, BAD_REQUEST, expectedMessage)
+			resultContentIs(offersUri, responseError, BAD_REQUEST, expectedMessage)
 	}
 
 	def "A post request with invalid JSON should respond with status code 400 and a meaningful error message"() {
@@ -64,7 +64,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final invalidJson = '{.'
 
 		when:
-			final response = doPost(postUri, invalidJson)
+			final response = doPost(offersUri, invalidJson)
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -74,7 +74,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final expectedMessage = "Invalid request body for Offer. JSON parse error: Unexpected character ('.' (code 46)): was expecting double-quote to start field name"
 
 		then:
-			resultContentIs(postUri, responseError, BAD_REQUEST, expectedMessage)
+			resultContentIs(offersUri, responseError, BAD_REQUEST, expectedMessage)
 	}
 
 	def "A post request with a wrong field type in the body should respond with status code 400 and a meaningful error message"() {
@@ -82,7 +82,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final invalidOffer = [userId: []]
 
 		when:
-			final response = doPost(postUri, toJson(invalidOffer))
+			final response = doPost(offersUri, toJson(invalidOffer))
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -91,9 +91,9 @@ class OfferPostRequestTest extends RequestSpecification {
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			resultContentIs(postUri, responseError, BAD_REQUEST)
-				// depending on spring boot version
-				(responseError.message == "Invalid JSON input for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token"
+			resultContentIs(offersUri, responseError, BAD_REQUEST)
+			// depending on spring boot version
+			(responseError.message == "Invalid JSON input for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token"
 				|| responseError.message == "JSON parse error for Offer in field 'userId': Cannot deserialize instance of `java.lang.String` out of START_ARRAY token")
 	}
 
@@ -102,7 +102,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final offerAsXml = "<offer><$userId>2</$userId></offer>"
 
 		when:
-			final response = doPost(postUri, offerAsXml, TEXT_XML)
+			final response = doPost(offersUri, offerAsXml, TEXT_XML)
 
 		then:
 			resultIs(response, UNSUPPORTED_MEDIA_TYPE)
@@ -112,7 +112,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final expectedMessage = "Content type 'text/xml' not supported"
 
 		then:
-			resultContentIs(postUri, responseError, UNSUPPORTED_MEDIA_TYPE, expectedMessage)
+			resultContentIs(offersUri, responseError, UNSUPPORTED_MEDIA_TYPE, expectedMessage)
 	}
 
 	def "A post request with umlaut should work"() {
@@ -120,7 +120,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			def offer = new Offer(userId: '\u00fc') // ue
 
 		when:
-			final response = doUTF8Post(postUri, toJson(offer))
+			final response = doUTF8Post(offersUri, toJson(offer))
 
 		then:
 			resultIs(response, CREATED, APPLICATION_JSON_UTF8_VALUE)
@@ -145,7 +145,7 @@ class OfferPostRequestTest extends RequestSpecification {
 				           startDate: '2013-12-20']
 
 		when:
-			final response = doPost(postUri, toJson(offer))
+			final response = doPost(offersUri, toJson(offer))
 
 		then:
 			resultIs(response, CREATED)
@@ -169,7 +169,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final offer = [startTimezone: 'Europe/Paris']
 
 		when:
-			final response = doPost(postUri, toJson(offer))
+			final response = doPost(offersUri, toJson(offer))
 
 		then:
 			resultIs(response, CREATED)
@@ -187,7 +187,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final invalidOffer = [startTime: 'x']
 
 		when:
-			final response = doPost(postUri, toJson(invalidOffer))
+			final response = doPost(offersUri, toJson(invalidOffer))
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -196,8 +196,8 @@ class OfferPostRequestTest extends RequestSpecification {
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			resultContentIs(postUri, responseError, BAD_REQUEST)
-				responseError.message.startsWith("JSON parse error for Offer in field 'startTime'")
+			resultContentIs(offersUri, responseError, BAD_REQUEST)
+			responseError.message.startsWith("JSON parse error for Offer in field 'startTime'")
 	}
 
 	def "A post request with an invalid startDate should respond with status code 400 and a meaningful error message"() {
@@ -205,7 +205,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final invalidOffer = [startDate: ',']
 
 		when:
-			final response = doPost(postUri, toJson(invalidOffer))
+			final response = doPost(offersUri, toJson(invalidOffer))
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -214,8 +214,8 @@ class OfferPostRequestTest extends RequestSpecification {
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			resultContentIs(postUri, responseError, BAD_REQUEST)
-				responseError.message.startsWith("JSON parse error for Offer in field 'startDate'")
+			resultContentIs(offersUri, responseError, BAD_REQUEST)
+			responseError.message.startsWith("JSON parse error for Offer in field 'startDate'")
 	}
 
 	def "A post request with an invalid startTimezone should respond with status code 400 and a meaningful error message"() {
@@ -223,7 +223,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final invalidOffer = [startTimezone: '1 7']
 
 		when:
-			final response = doPost(postUri, toJson(invalidOffer))
+			final response = doPost(offersUri, toJson(invalidOffer))
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -232,7 +232,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			resultContentIs(postUri, responseError, BAD_REQUEST)
-				responseError.message.startsWith("JSON parse error for Offer in field 'startTimezone'")
+			resultContentIs(offersUri, responseError, BAD_REQUEST)
+			responseError.message.startsWith("JSON parse error for Offer in field 'startTimezone'")
 	}
 }

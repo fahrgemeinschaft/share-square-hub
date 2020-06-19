@@ -6,22 +6,29 @@ import static org.sharesquare.hub.exception.ErrorMessage.OFFER_IS_EMPTY;
 import static org.sharesquare.hub.exception.ErrorMessage.OFFER_NOT_VALID;
 import static org.sharesquare.hub.exception.ErrorMessage.REQUEST_BODY_IS_EMPTY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -60,7 +67,7 @@ public class OfferResponseEntityExceptionHandler {
 		} else if (message.startsWith(REQUEST_BODY_IS_EMPTY)) {
 			message = OFFER_IS_EMPTY;
 		}
-		log.info("Wrong user input: " + message);
+		log.info("Wrong client request (http message not readable): " + message);
 		return new ResponseEntity<>(new ResponseError(BAD_REQUEST, message, request), BAD_REQUEST);
 	}
 
@@ -75,13 +82,37 @@ public class OfferResponseEntityExceptionHandler {
 				message = String.format("%s Value '%s' not excepted.", e.getDefaultMessage(), e.getRejectedValue());
 			}
 		}
-		log.info("Wrong user input: " + message);
+		log.info("Wrong client request (method argument not valid): " + message);
+		return new ResponseEntity<>(new ResponseError(BAD_REQUEST, message, request), BAD_REQUEST);
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex, WebRequest request) {
+		String message = ex.getMessage();
+		if (ex.getCause() instanceof IllegalArgumentException) {
+			message = String.format("Type mismatch for path variable: %s", ((IllegalArgumentException) ex.getCause()).getMessage());
+		}
+		log.info("Wrong client request (method argument type mismatch): " + message);
 		return new ResponseEntity<>(new ResponseError(BAD_REQUEST, message, request), BAD_REQUEST);
 	}
 
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
 	public ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, WebRequest request) {
-		log.info("Wrong user input: " + ex.getMessage());
+		log.info("Wrong client request (http media type not supported): " + ex.getMessage());
 		return new ResponseEntity<>(new ResponseError(UNSUPPORTED_MEDIA_TYPE, ex.getMessage(), request), UNSUPPORTED_MEDIA_TYPE);
+	}
+
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, WebRequest request) {
+		String message = ex.getMessage();
+		HttpStatus httpStatus = METHOD_NOT_ALLOWED;
+		HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
+		if (httpServletRequest.getMethod().equals("DELETE")
+				&& httpServletRequest.getRequestURI().equals("/offers/")) {
+			message = "Required path variable Offer id is missing";
+			httpStatus = BAD_REQUEST;
+		}
+		log.info("Wrong client request (http request method not supported): " + message);
+		return new ResponseEntity<>(new ResponseError(httpStatus, message, request), httpStatus);
 	}
 }

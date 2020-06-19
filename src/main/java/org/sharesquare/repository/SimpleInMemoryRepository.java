@@ -42,6 +42,11 @@ public class SimpleInMemoryRepository<T extends IShareSquareObject> implements I
     }
 
     @Override
+    public void deleteById(String id) {
+    	inMemData.remove(id);
+    }
+
+    @Override
     public Optional<T> findById(String id) {
         return Optional.ofNullable(inMemData.get(id));
     }
