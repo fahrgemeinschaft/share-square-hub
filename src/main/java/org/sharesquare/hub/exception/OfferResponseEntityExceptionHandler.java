@@ -2,6 +2,7 @@ package org.sharesquare.hub.exception;
 
 import static org.sharesquare.hub.exception.ErrorMessage.JSON_INVALID_PROBLEM;
 import static org.sharesquare.hub.exception.ErrorMessage.JSON_PARSE_ERROR;
+import static org.sharesquare.hub.exception.ErrorMessage.OFFER_ID_IS_EMPTY;
 import static org.sharesquare.hub.exception.ErrorMessage.OFFER_IS_EMPTY;
 import static org.sharesquare.hub.exception.ErrorMessage.OFFER_NOT_VALID;
 import static org.sharesquare.hub.exception.ErrorMessage.REQUEST_BODY_IS_EMPTY;
@@ -98,21 +99,35 @@ public class OfferResponseEntityExceptionHandler {
 
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
 	public ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, WebRequest request) {
-		log.info("Wrong client request (http media type not supported): " + ex.getMessage());
-		return new ResponseEntity<>(new ResponseError(UNSUPPORTED_MEDIA_TYPE, ex.getMessage(), request), UNSUPPORTED_MEDIA_TYPE);
+		String message = ex.getMessage();
+		HttpStatus status = UNSUPPORTED_MEDIA_TYPE;
+		if (requestHasEmptyPathVariable(request)) {
+			message = OFFER_ID_IS_EMPTY;
+			status = BAD_REQUEST;
+		}
+		log.info("Wrong client request (http media type not supported): " + message);
+		return new ResponseEntity<>(new ResponseError(status, message, request), status);
 	}
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, WebRequest request) {
 		String message = ex.getMessage();
-		HttpStatus httpStatus = METHOD_NOT_ALLOWED;
-		HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
-		if (httpServletRequest.getMethod().equals("DELETE")
-				&& httpServletRequest.getRequestURI().equals("/offers/")) {
-			message = "Required path variable Offer id is missing";
-			httpStatus = BAD_REQUEST;
+		HttpStatus status = METHOD_NOT_ALLOWED;
+		if (requestHasEmptyPathVariable(request)) {
+			message = OFFER_ID_IS_EMPTY;
+			status = BAD_REQUEST;
 		}
 		log.info("Wrong client request (http request method not supported): " + message);
-		return new ResponseEntity<>(new ResponseError(httpStatus, message, request), httpStatus);
+		return new ResponseEntity<>(new ResponseError(status, message, request), status);
+	}
+
+	private boolean requestHasEmptyPathVariable(WebRequest request) {
+		HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
+		if ((httpServletRequest.getMethod().equals("GET")
+				|| httpServletRequest.getMethod().equals("DELETE"))
+				&& httpServletRequest.getRequestURI().equals("/offers/")) {
+			return true;
+		}
+		return false;
 	}
 }
