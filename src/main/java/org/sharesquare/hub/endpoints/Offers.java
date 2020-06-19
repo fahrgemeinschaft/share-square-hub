@@ -40,9 +40,6 @@ public class Offers {
     private static final Logger log = LoggerFactory.getLogger(Offers.class);
 
     @Autowired
-    private IShareSquareSanitizer<Offer> offerSanitizer;
-
-    @Autowired
     OfferService offerService;
     //TODO: use offerservice, remove offerRepository
 
@@ -57,16 +54,12 @@ public class Offers {
     @ApiResponse(description = "Malformed ID", responseCode = "400", content = @Content)
     @ApiResponse(description = "Not existing ID", responseCode = "404", content = @Content)
     @GetMapping(path="/offers/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> getById(@PathVariable final String id){
-        if(offerSanitizer.isIdValid(id)) {
-            final Optional<Offer> offer = offerRepository.findById(id);
-            if(offer.isPresent()) {
-                return ResponseEntity.ok(offer.get());
-            }else{
-                return ResponseEntity.notFound().build();
-            }
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    public ResponseEntity<Offer> getOffer(@PathVariable final UUID id) {
+    	final Offer offer = offerService.getOffer(id);
+    	if (offer != null) {
+    		return ResponseEntity.ok(offer);
+    	}
+    	return new ResponseEntity<>(NOT_FOUND);
     }
 
     @Operation(description = "Add a new Offer")
