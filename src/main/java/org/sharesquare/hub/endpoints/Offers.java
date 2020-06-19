@@ -34,6 +34,7 @@ import javax.validation.Valid;
 @ApiResponse(responseCode = "401", description = "Wrong client authorization", content = @Content)
 @ApiResponse(responseCode = "403", description = "Client not allowed", content = @Content)
 @RestController
+@RequestMapping("/offers")
 public class Offers {
 	
     private static final Logger log = LoggerFactory.getLogger(Offers.class);
@@ -52,7 +53,7 @@ public class Offers {
     @ApiResponse(description = "Successful operation", responseCode = "200")
     @ApiResponse(description = "Malformed ID", responseCode = "400", content = @Content)
     @ApiResponse(description = "Not existing ID", responseCode = "404", content = @Content)
-    @GetMapping(path="/offers/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> getOffer(@PathVariable final UUID id) {
     	final Offer offer = offerService.getOffer(id);
     	if (offer != null) {
@@ -65,7 +66,7 @@ public class Offers {
     @ApiResponse(responseCode = "201", description = "Success")
     @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
     @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
-    @PostMapping(path = "/offers", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> createOffer(@Valid @RequestBody Offer offer) {
 
         final Optional<Offer> result = offerRepository.create(offer);
@@ -88,7 +89,7 @@ public class Offers {
     @ApiResponse(description = "Successful operation", responseCode = "202")
     @ApiResponse(description = "Malformed Data", responseCode = "422", content = @Content)
     @ApiResponse(description = "Entity Not Found", responseCode = "404", content = @Content)
-    @PutMapping(path = "/offers", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> updateOffer(@RequestBody Offer offer){
 
         final Optional<Offer> result = offerRepository.update(offer);
@@ -99,7 +100,7 @@ public class Offers {
         }
     }
 
-    @GetMapping(path = "/offers",produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Offer>> findMany(@RequestParam final String search,
     		@PageableDefault(page = 0, size = 50) final Pageable pageable) {
 		try {
@@ -115,7 +116,7 @@ public class Offers {
     @ApiResponse(responseCode = "204", description = "No content success")
     @ApiResponse(responseCode = "404", description = "Offer doesn't exist")
     @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing")
-    @DeleteMapping(path = "/offers/{id}")
+    @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteOffer(@PathVariable final UUID id) {
     	if (offerService.deleteOffer(id)) {
     		return new ResponseEntity<>(NO_CONTENT);
