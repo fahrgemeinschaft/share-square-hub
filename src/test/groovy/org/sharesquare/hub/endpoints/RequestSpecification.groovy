@@ -136,6 +136,17 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
+	def doUTF8Get(uri) {
+		mvc.perform(
+				get(uri)
+					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.accept(APPLICATION_JSON_UTF8)
+			)
+			.andDo(print())
+			.andReturn()
+			.response
+	}
+
 	def doDelete(uri) {
 		mvc.perform(
 				delete(uri)

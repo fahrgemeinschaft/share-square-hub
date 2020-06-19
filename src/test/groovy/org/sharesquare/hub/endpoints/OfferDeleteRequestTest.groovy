@@ -10,13 +10,19 @@ import spock.lang.Issue
 @Issue("#11")
 class OfferDeleteRequestTest extends RequestSpecification {
 
-	def "A delete request with an existing id should respond with status code 204"() {
+	def "A delete request with an existing id should work and respond with status code 204"() {
 		when:
 			final uuid = fromJson(doPost(offersUri, defaultOffer).contentAsString).id
 			final response = doDelete("$offersUri/$uuid")
 
 		then:
 			response.status == NO_CONTENT.value
+
+		when:
+			final getResponse = doGet("$offersUri/$uuid")
+
+		then:
+			getResponse.status == NOT_FOUND.value
 	}
 
 	def "A delete request with a not existing id should respond with status code 404"() {
@@ -28,6 +34,12 @@ class OfferDeleteRequestTest extends RequestSpecification {
 
 		then:
 			response.status == NOT_FOUND.value
+
+		when:
+			final getResponse = doGet("$offersUri/$uuid")
+
+		then:
+			getResponse.status == NOT_FOUND.value
 	}
 
 	def "A delete request with an invalid UUID or an empty id should respond with status code 400 and a meaningful error message"() {
@@ -42,6 +54,12 @@ class OfferDeleteRequestTest extends RequestSpecification {
 
 		then:
 			resultContentIs("$offersUri/$uuid", responseError, BAD_REQUEST, expectedMessage)
+
+		when:
+			final getResponse = doGet("$offersUri/$uuid")
+
+		then:
+			getResponse.status == BAD_REQUEST.value
 
 		where:
 			uuid      | expectedMessage
