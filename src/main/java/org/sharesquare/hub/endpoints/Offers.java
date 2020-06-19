@@ -12,7 +12,6 @@ import org.sharesquare.hub.exception.OfferCreationProblem;
 import org.sharesquare.hub.service.OfferService;
 import org.sharesquare.model.Offer;
 import org.sharesquare.repository.IRepository;
-import org.sharesquare.sanity.IShareSquareSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
