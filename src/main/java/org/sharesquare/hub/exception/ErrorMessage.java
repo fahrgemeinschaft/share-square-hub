@@ -14,4 +14,6 @@ public final class ErrorMessage {
 	public static final String JSON_PARSE_ERROR = "JSON parse error";
 
 	public static final String JSON_INVALID_PROBLEM = "Invalid JSON input";
+
+	public static final String OFFER_ID_IS_EMPTY = "Required path variable Offer id is missing";
 }

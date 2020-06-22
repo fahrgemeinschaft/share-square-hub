@@ -39,6 +39,12 @@ class OfferPostRequestTest extends RequestSpecification {
 
 		then:
 			responseOffer == offer
+
+		when:
+			final getResponse = doGet("$offersUri/${responseOffer.id}")
+
+		then:
+			fromJson(getResponse.contentAsString) == responseOffer
 	}
 
 	def "A post request with an empty body should respond with status code 400 and a meaningful error message"() {
@@ -137,6 +143,12 @@ class OfferPostRequestTest extends RequestSpecification {
 
 		then:
 			responseOffer == offer
+
+		when:
+			final getResponse = doUTF8Get("$offersUri/${responseOffer.id}")
+
+		then:
+			fromJson(getResponse.contentAsString) == responseOffer
 	}
 
 	def "A post request with startTime and startDate should work and have the default startTimezone in the response"() {
@@ -162,6 +174,12 @@ class OfferPostRequestTest extends RequestSpecification {
 				startTimezone           != null
 				startTimezone as String == 'Europe/Berlin'
 			}
+
+		when:
+			final getResponse = doGet("$offersUri/${responseOffer.id}")
+
+		then:
+			fromJson(getResponse.contentAsString) == responseOffer
 	}
 
 	def "A post request with startTimezone should work"() {
@@ -180,6 +198,12 @@ class OfferPostRequestTest extends RequestSpecification {
 		then:
 			responseOffer.startTimezone != null
 			responseOffer.startTimezone as String == offer.startTimezone
+
+		when:
+			final getResponse = doGet("$offersUri/${responseOffer.id}")
+
+		then:
+			fromJson(getResponse.contentAsString) == responseOffer
 	}
 
 	def "A post request with an invalid startTime should respond with status code 400 and a meaningful error message"() {

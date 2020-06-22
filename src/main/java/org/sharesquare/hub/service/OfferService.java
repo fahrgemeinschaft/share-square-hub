@@ -38,6 +38,15 @@ public class OfferService {
     //TODO: implement CRUD operations
     //TODO: implement findMany (call through repository)
 
+	public Offer getOffer(UUID id) {
+		String idString = id.toString();
+		Optional<Offer> offer = offerRepository.findById(idString);
+		if (offer.isPresent()) {
+			return offer.get();
+		}
+		return null;
+	}
+
     public boolean deleteOffer(UUID id) {
     	String idString = id.toString();
     	if (offerRepository.findById(idString).isPresent()) {
