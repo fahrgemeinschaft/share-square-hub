@@ -53,7 +53,7 @@ public class Offers {
     @ApiResponse(responseCode = "200", description = "Success")
     @ApiResponse(responseCode = "404", description = "Offer doesn't exist", content = @Content)
     @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing", content = @Content)
-    @GetMapping(path="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> getOffer(@PathVariable final UUID id) {
     	final Offer offer = offerService.getOffer(id);
     	if (offer != null) {
