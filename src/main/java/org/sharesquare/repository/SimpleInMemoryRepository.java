@@ -27,10 +27,7 @@ public class SimpleInMemoryRepository<T extends IShareSquareObject> implements I
 
     @Override
     public Optional<T> update(T data) {
-    	if (data.getId() != null) {
     		return Optional.ofNullable(inMemData.replace(data.getId().toString(),data));
-    	}
-    	return Optional.empty();
     }
 
     @Override
