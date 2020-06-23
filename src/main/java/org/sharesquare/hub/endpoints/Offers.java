@@ -67,8 +67,7 @@ public class Offers {
     @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
     @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> createOffer(@Valid @RequestBody Offer offer) {
-
+    public ResponseEntity<Offer> addOffer(@Valid @RequestBody Offer offer) {
         final Optional<Offer> result = offerRepository.create(offer);
         if(result.isPresent()) {
         	return new ResponseEntity<>(result.get(), HttpStatus.CREATED);
