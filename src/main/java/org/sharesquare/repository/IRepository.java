@@ -18,7 +18,7 @@ public interface IRepository<T extends IShareSquareObject> {
 
     Optional<T> delete(T data);
 
-    public void deleteById(String id);
+    void deleteById(String id);
 
     Optional<T> findById(String id);
 
