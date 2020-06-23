@@ -89,15 +89,13 @@ public class Offers {
     @ApiResponse(description = "Successful operation", responseCode = "202")
     @ApiResponse(description = "Malformed Data", responseCode = "422", content = @Content)
     @ApiResponse(description = "Entity Not Found", responseCode = "404", content = @Content)
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> updateOffer(@RequestBody Offer offer){
-
-        final Optional<Offer> result = offerRepository.update(offer);
-        if(result.isPresent()) {
-            return ResponseEntity.accepted().body(result.get());
-        }else{
-            return ResponseEntity.unprocessableEntity().build();
-        }
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateOffer(@PathVariable final UUID id,
+    		                                @Valid @RequestBody Offer offer) {
+    	if (offerService.updateOffer(id, offer)) {
+    		return ResponseEntity.ok(null);
+    	}
+    	return new ResponseEntity<>(NOT_FOUND);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
