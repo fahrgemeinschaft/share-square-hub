@@ -9,6 +9,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 
 import org.sharesquare.model.Offer
@@ -140,6 +141,31 @@ class RequestSpecification extends Specification {
 		mvc.perform(
 				get(uri)
 					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.accept(APPLICATION_JSON_UTF8)
+			)
+			.andDo(print())
+			.andReturn()
+			.response
+	}
+
+	def doPut(uri, requestBody, mediaType = APPLICATION_JSON) {
+		mvc.perform(
+				put(uri)
+					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.contentType(mediaType)
+					.content(requestBody)
+			)
+			.andDo(print())
+			.andReturn()
+			.response
+	}
+
+	def doUTF8Put(uri, requestBody, mediaType = APPLICATION_JSON) {
+		mvc.perform(
+				put(uri)
+					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.contentType(mediaType)
+					.content(requestBody)
 					.accept(APPLICATION_JSON_UTF8)
 			)
 			.andDo(print())

@@ -12,14 +12,14 @@ class OfferDeleteRequestTest extends RequestSpecification {
 
 	def "A delete request with an existing id should work and respond with status code 204"() {
 		when:
-			final uuid = fromJson(doPost(offersUri, defaultOffer).contentAsString).id
-			final response = doDelete("$offersUri/$uuid")
+			final id = fromJson(doPost(offersUri, defaultOffer).contentAsString).id
+			final response = doDelete("$offersUri/$id")
 
 		then:
 			response.status == NO_CONTENT.value
 
 		when:
-			final getResponse = doGet("$offersUri/$uuid")
+			final getResponse = doGet("$offersUri/$id")
 
 		then:
 			getResponse.status == NOT_FOUND.value
@@ -27,16 +27,16 @@ class OfferDeleteRequestTest extends RequestSpecification {
 
 	def "A delete request with a not existing id should respond with status code 404"() {
 		given:
-			final uuid = UUID.randomUUID()
+			final id = UUID.randomUUID()
 
 		when:
-			final response = doDelete("$offersUri/$uuid")
+			final response = doDelete("$offersUri/$id")
 
 		then:
 			response.status == NOT_FOUND.value
 
 		when:
-			final getResponse = doGet("$offersUri/$uuid")
+			final getResponse = doGet("$offersUri/$id")
 
 		then:
 			getResponse.status == NOT_FOUND.value
@@ -44,7 +44,7 @@ class OfferDeleteRequestTest extends RequestSpecification {
 
 	def "A delete request with an invalid UUID or an empty id should respond with status code 400 and a meaningful error message"() {
 		when:
-			final response = doDelete("$offersUri/$uuid")
+			final response = doDelete("$offersUri/$id")
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -53,17 +53,17 @@ class OfferDeleteRequestTest extends RequestSpecification {
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			resultContentIs("$offersUri/$uuid", responseError, BAD_REQUEST, expectedMessage)
+			resultContentIs("$offersUri/$id", responseError, BAD_REQUEST, expectedMessage)
 
 		when:
-			final getResponse = doGet("$offersUri/$uuid")
+			final getResponse = doGet("$offersUri/$id")
 
 		then:
 			getResponse.status == BAD_REQUEST.value
 
 		where:
-			uuid      | expectedMessage
-			'invalid' | "Type mismatch for path variable: Invalid UUID string: $uuid"
+			id       | expectedMessage
+			'invalid' | "Type mismatch for path variable: Invalid UUID string: $id"
 			''        | 'Required path variable Offer id is missing'
 	}
 }

@@ -12,8 +12,8 @@ class OfferGetRequestTest extends RequestSpecification {
 
 	def "A get request with an existing id should return the corresponding Offer along with status code 200"() {
 		when:
-			final uuid = fromJson(doPost(offersUri, defaultOffer).contentAsString).id
-			final response = doGet("$offersUri/$uuid")
+			final id = fromJson(doPost(offersUri, defaultOffer).contentAsString).id
+			final response = doGet("$offersUri/$id")
 
 		then:
 			resultIs(response, OK)
@@ -28,10 +28,10 @@ class OfferGetRequestTest extends RequestSpecification {
 
 	def "A get request with a not existing id should respond with status code 404"() {
 		given:
-			final uuid = UUID.randomUUID()
+			final id = UUID.randomUUID()
 
 		when:
-			final response = doGet("$offersUri/$uuid")
+			final response = doGet("$offersUri/$id")
 
 		then:
 			response.status == NOT_FOUND.value
@@ -39,7 +39,7 @@ class OfferGetRequestTest extends RequestSpecification {
 
 	def "A get request with an invalid UUID or an empty id should respond with status code 400 and a meaningful error message"() {
 		when:
-			final response = doGet("$offersUri/$uuid")
+			final response = doGet("$offersUri/$id")
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -48,11 +48,11 @@ class OfferGetRequestTest extends RequestSpecification {
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			resultContentIs("$offersUri/$uuid", responseError, BAD_REQUEST, expectedMessage)
+			resultContentIs("$offersUri/$id", responseError, BAD_REQUEST, expectedMessage)
 
 		where:
-			uuid      | expectedMessage
-			'invalid' | "Type mismatch for path variable: Invalid UUID string: $uuid"
+			id        | expectedMessage
+			'invalid' | "Type mismatch for path variable: Invalid UUID string: $id"
 			''        | 'Required path variable Offer id is missing'
 	}
 }

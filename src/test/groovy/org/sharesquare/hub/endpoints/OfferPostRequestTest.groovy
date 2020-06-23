@@ -41,7 +41,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			responseOffer == offer
 
 		when:
-			final getResponse = doGet("$offersUri/${responseOffer.id}")
+			final getResponse = doGet("$offersUri/$responseOffer.id")
 
 		then:
 			fromJson(getResponse.contentAsString) == responseOffer
@@ -145,7 +145,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			responseOffer == offer
 
 		when:
-			final getResponse = doUTF8Get("$offersUri/${responseOffer.id}")
+			final getResponse = doUTF8Get("$offersUri/$responseOffer.id")
 
 		then:
 			fromJson(getResponse.contentAsString) == responseOffer
@@ -176,7 +176,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			}
 
 		when:
-			final getResponse = doGet("$offersUri/${responseOffer.id}")
+			final getResponse = doGet("$offersUri/$responseOffer.id")
 
 		then:
 			fromJson(getResponse.contentAsString) == responseOffer
@@ -200,16 +200,13 @@ class OfferPostRequestTest extends RequestSpecification {
 			responseOffer.startTimezone as String == offer.startTimezone
 
 		when:
-			final getResponse = doGet("$offersUri/${responseOffer.id}")
+			final getResponse = doGet("$offersUri/$responseOffer.id")
 
 		then:
 			fromJson(getResponse.contentAsString) == responseOffer
 	}
 
-	def "A post request with an invalid startTime should respond with status code 400 and a meaningful error message"() {
-		given:
-			final invalidOffer = [startTime: 'x']
-
+	def "A post request with an invalid startTime or startDate or startTimezone should respond with status code 400 and a meaningful error message"() {
 		when:
 			final response = doPost(offersUri, toJson(invalidOffer))
 
@@ -221,42 +218,12 @@ class OfferPostRequestTest extends RequestSpecification {
 
 		then:
 			resultContentIs(offersUri, responseError, BAD_REQUEST)
-			responseError.message.startsWith("JSON parse error for Offer in field 'startTime'")
-	}
+			responseError.message.startsWith("JSON parse error for Offer in field '${(invalidOffer as Map).keySet()[0]}'")
 
-	def "A post request with an invalid startDate should respond with status code 400 and a meaningful error message"() {
-		given:
-			final invalidOffer = [startDate: ',']
-
-		when:
-			final response = doPost(offersUri, toJson(invalidOffer))
-
-		then:
-			resultIs(response, BAD_REQUEST)
-
-		when:
-			final responseError = fromJson(response.contentAsString, Map)
-
-		then:
-			resultContentIs(offersUri, responseError, BAD_REQUEST)
-			responseError.message.startsWith("JSON parse error for Offer in field 'startDate'")
-	}
-
-	def "A post request with an invalid startTimezone should respond with status code 400 and a meaningful error message"() {
-		given:
-			final invalidOffer = [startTimezone: '1 7']
-
-		when:
-			final response = doPost(offersUri, toJson(invalidOffer))
-
-		then:
-			resultIs(response, BAD_REQUEST)
-
-		when:
-			final responseError = fromJson(response.contentAsString, Map)
-
-		then:
-			resultContentIs(offersUri, responseError, BAD_REQUEST)
-			responseError.message.startsWith("JSON parse error for Offer in field 'startTimezone'")
+		where:
+			invalidOffer           | _
+			[startTime: 'x']       | _
+			[startDate: ',']       | _
+			[startTimezone: '1 7'] | _
 	}
 }
