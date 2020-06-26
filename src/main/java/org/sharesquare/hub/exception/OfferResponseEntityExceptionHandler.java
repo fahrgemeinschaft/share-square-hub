@@ -124,6 +124,7 @@ public class OfferResponseEntityExceptionHandler {
 	private boolean requestHasEmptyPathVariable(WebRequest request) {
 		HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
 		if ((httpServletRequest.getMethod().equals("GET")
+				|| httpServletRequest.getMethod().equals("PUT")
 				|| httpServletRequest.getMethod().equals("DELETE"))
 				&& httpServletRequest.getRequestURI().equals("/offers/")) {
 			return true;

@@ -53,7 +53,7 @@ public class Offers {
     @ApiResponse(responseCode = "200", description = "Success")
     @ApiResponse(responseCode = "404", description = "Offer doesn't exist", content = @Content)
     @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing", content = @Content)
-    @GetMapping(path="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> getOffer(@PathVariable final UUID id) {
     	final Offer offer = offerService.getOffer(id);
     	if (offer != null) {
@@ -62,13 +62,12 @@ public class Offers {
     	return new ResponseEntity<>(NOT_FOUND);
     }
 
-    @Operation(description = "Add a new Offer")
+    @Operation(description = "Add a new Offer using a generated id")
     @ApiResponse(responseCode = "201", description = "Success")
     @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
     @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> createOffer(@Valid @RequestBody Offer offer) {
-
+    public ResponseEntity<Offer> addOffer(@Valid @RequestBody Offer offer) {
         final Optional<Offer> result = offerRepository.create(offer);
         if(result.isPresent()) {
         	return new ResponseEntity<>(result.get(), HttpStatus.CREATED);
@@ -85,19 +84,18 @@ public class Offers {
         }
     }
 
-    @Operation(description = "Update an Offer")
-    @ApiResponse(description = "Successful operation", responseCode = "202")
-    @ApiResponse(description = "Malformed Data", responseCode = "422", content = @Content)
-    @ApiResponse(description = "Entity Not Found", responseCode = "404", content = @Content)
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> updateOffer(@RequestBody Offer offer){
-
-        final Optional<Offer> result = offerRepository.update(offer);
-        if(result.isPresent()) {
-            return ResponseEntity.accepted().body(result.get());
-        }else{
-            return ResponseEntity.unprocessableEntity().build();
-        }
+    @Operation(description = "Update an existing Offer")
+    @ApiResponse(responseCode = "200", description = "Success")
+    @ApiResponse(responseCode = "404", description = "Offer doesn't exist")
+    @ApiResponse(responseCode = "400", description = "Wrong data input")
+    @ApiResponse(responseCode = "415", description = "Wrong format")
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateOffer(@PathVariable final UUID id,
+    		                                @Valid @RequestBody Offer offer) {
+    	if (offerService.updateOffer(id, offer)) {
+    		return ResponseEntity.ok(null);
+    	}
+    	return new ResponseEntity<>(NOT_FOUND);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

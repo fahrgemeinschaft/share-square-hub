@@ -4,7 +4,6 @@ import org.sharesquare.IShareSquareObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-@Service
 public class SimpleInMemoryRepository<T extends IShareSquareObject> implements IRepository<T> {
     ConcurrentMap<String, T> inMemData = new ConcurrentHashMap<>();
 
@@ -27,10 +25,7 @@ public class SimpleInMemoryRepository<T extends IShareSquareObject> implements I
 
     @Override
     public Optional<T> update(T data) {
-    	if (data.getId() != null) {
     		return Optional.ofNullable(inMemData.replace(data.getId().toString(),data));
-    	}
-    	return Optional.empty();
     }
 
     @Override

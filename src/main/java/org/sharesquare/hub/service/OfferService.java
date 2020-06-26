@@ -47,6 +47,15 @@ public class OfferService {
 		return null;
 	}
 
+    public boolean updateOffer(UUID id, Offer offer) {
+		offer.setId(id);
+		Optional<Offer> previousOffer = offerRepository.update(offer);
+		if (previousOffer.isPresent()) {
+			return true;
+		}
+		return false;
+	}
+
     public boolean deleteOffer(UUID id) {
     	String idString = id.toString();
     	if (offerRepository.findById(idString).isPresent()) {
