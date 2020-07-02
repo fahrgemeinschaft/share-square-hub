@@ -33,3 +33,16 @@ curl -H "Content-Type: application/x-www-form-urlencoded" \
 ```
 
 Authorize request with header `"Authorization: Bearer {access_token}"`
+
+### Datasource
+
+The Application runs with a H2 in-memory database. The database web console can be accessed at [http://localhost:8080/h2-console](http://localhost:8080/h2-console).
+
+Use the following settings:
+
+**Saved Settings:** Generic H2 (Embedded)  
+**Setting Name:** Generic H2 (Embedded)  
+**Driver Class:** org.h2.Driver  
+**JDBC URL:** jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1  
+**User Name:** sa  
+**Password:**
