@@ -25,5 +25,3 @@ local.properties
 .project
 .settings/
 bin/
-
-tmp/
