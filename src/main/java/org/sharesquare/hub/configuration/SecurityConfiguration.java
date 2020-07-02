@@ -94,9 +94,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) {
 		web.ignoring().mvcMatchers(
+				// Swagger UI
 				"/v3/api-docs/**", 
 				"/swagger-ui.html", 
-				"/swagger-ui/**");
+				"/swagger-ui/**",
+				// H2 Web Console
+				"/h2-console/**",
+				"/error/**",
+				"/favicon.ico");
 	}
 
 	@Override
