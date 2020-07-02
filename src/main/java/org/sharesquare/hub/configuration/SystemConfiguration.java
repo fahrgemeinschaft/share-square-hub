@@ -27,11 +27,6 @@ public class SystemConfiguration {
 	private boolean useExamples;
 
     @Bean
-    IRepository<Offer> createOfferRepo(){
-        return new SimpleInMemoryRepository<Offer>();
-    }
-
-    @Bean
     IRepository<Connector> createConnectorRepo(){
     	if (useExamples) {
     		return ExampleData.connectorRepo();
