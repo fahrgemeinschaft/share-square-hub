@@ -1,5 +1,7 @@
 package org.sharesquare.hub.endpoints
 
+import static org.sharesquare.hub.endpoints.OfferUtil.defaultOffer
+import static org.sharesquare.hub.endpoints.OfferUtil.exampleOffer
 import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
 import static org.sharesquare.hub.endpoints.OfferUtil.userId
 import static org.springframework.http.HttpStatus.BAD_REQUEST
@@ -15,29 +17,40 @@ import spock.lang.Issue
 
 @Issue("#16")
 class OfferPutRequestTest extends RequestSpecification {
-	
+
 	def existingId
-	
+
 	def existingId() {
 		existingId != null ? existingId : fromJson(doPost(offersUri, defaultOffer).contentAsString).id
 	}
 
 	def "A valid put request should work and return 200"() {
-		given:
-			def updateOffer = new Offer(id: existingId(),
-				                        userId: '3')
-
 		when:
-			final response = doPut("$offersUri/$updateOffer.id", toJson(updateOffer))
+			def requestOffer = null
+			if (!(offer instanceof Offer)) {
+				requestOffer = fromJson(offer)
+			} else {
+				requestOffer = offer
+			}
+			requestOffer.id = existingId()
+			final response = doPut("$offersUri/$requestOffer.id", toJson(requestOffer))
 
 		then:
 			response.status == OK.value
 
 		when:
-			final getResponse = doGet("$offersUri/$updateOffer.id")
+			final getResponse = doGet("$offersUri/$requestOffer.id")
+			def getResponseOffer = fromJson(getResponse.contentAsString)
+			getResponseOffer = replaceEmptyListsByNull(getResponseOffer)
 
 		then:
-			fromJson(getResponse.contentAsString) == updateOffer
+			getResponseOffer.id == requestOffer.id
+			getResponseOffer == requestOffer
+
+		where:
+			offer                  | _
+			new Offer(userId: '3') | _
+			exampleOffer           | _
 	}
 
 	def "A put request with a not existing id should respond with status code 404"() {
@@ -49,7 +62,6 @@ class OfferPutRequestTest extends RequestSpecification {
 
 		then:
 			response.status == NOT_FOUND.value
-
 
 		when:
 			final getResponse = doGet("$offersUri/$id")
@@ -166,9 +178,12 @@ class OfferPutRequestTest extends RequestSpecification {
 
 		when:
 			final getResponse = doUTF8Get("$offersUri/$updateOffer.id")
+			def getResponseOffer = fromJson(getResponse.contentAsString)
+			getResponseOffer = replaceEmptyListsByNull(getResponseOffer)
 
 		then:
-			fromJson(getResponse.contentAsString) == updateOffer
+			getResponseOffer.id == updateOffer.id
+			getResponseOffer == updateOffer
 	}
 
 	def "A put request with startTime and startDate should work and have the default startTimezone in the response"() {
@@ -212,7 +227,7 @@ class OfferPutRequestTest extends RequestSpecification {
 
 		then:
 			response.status == OK.value
-			
+
 		when:
 			final getResponse = doGet("$offersUri/$id")
 			final responseOffer = fromJson(getResponse.contentAsString)

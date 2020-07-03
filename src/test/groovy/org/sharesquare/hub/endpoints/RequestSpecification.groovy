@@ -1,5 +1,6 @@
 package org.sharesquare.hub.endpoints
 
+import static org.sharesquare.hub.endpoints.OfferUtil.defaultOffer
 import static org.springframework.http.HttpHeaders.AUTHORIZATION
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
@@ -48,8 +49,6 @@ class RequestSpecification extends Specification {
 
 	@Value("\${auth.server.client.not.in.scope.secret}")
 	private String clientNotInScopeSecret;
-
-	static final defaultOffer = '{}'
 
 	def authServerResponse(id = clientId, secret = clientSecret) {
 		(new RESTClient(tokenUri))
@@ -189,6 +188,19 @@ class RequestSpecification extends Specification {
 
 	def toJson(object) {
 		objectMapper.writer().withDefaultPrettyPrinter().writeValueAsString(object);
+	}
+
+	def replaceEmptyListsByNull(offer) {
+		if (offer.contactOptions == []) {
+			offer.contactOptions = null
+		}
+		if (offer.targetPlatforms == []) {
+			offer.targetPlatforms = null
+		}
+		if (offer.preferences == []) {
+			offer.preferences = null
+		}
+		return offer
 	}
 
 	void resultIs(response, httpStatus, mediaType = APPLICATION_JSON_VALUE) {

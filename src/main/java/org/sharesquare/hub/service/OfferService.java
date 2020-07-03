@@ -1,12 +1,14 @@
 package org.sharesquare.hub.service;
 
 
-import org.sharesquare.model.Connector;
+import org.sharesquare.hub.conversion.OfferConverter;
+import org.sharesquare.hub.model.data.*;
+import org.sharesquare.hub.repository.OfferRepository;
 import org.sharesquare.model.Offer;
-import org.sharesquare.repository.IRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,7 +16,7 @@ import java.util.UUID;
 public class OfferService {
 
     @Autowired
-    private IRepository<Offer> offerRepository;
+    private OfferRepository offerRepository;
 
     @Autowired
     private ConnectorService connectorService;
@@ -29,39 +31,85 @@ public class OfferService {
         if(offer.getId()==null){
             offer.setId(UUID.randomUUID());
         }
+        /*
         final Optional<Offer> result = offerRepository.create(offer);
         if(result.isPresent()) {
             connectorService.updateOffer(result.get());
         }
         return result;
+        */
+        return null;
     }
     //TODO: implement CRUD operations
     //TODO: implement findMany (call through repository)
 
-	public Offer getOffer(UUID id) {
-		String idString = id.toString();
-		Optional<Offer> offer = offerRepository.findById(idString);
-		if (offer.isPresent()) {
-			return offer.get();
+	public Offer getOffer(final UUID id) {
+		Optional<EntityOffer> entityOffer = offerRepository.findById(id);
+		if (entityOffer.isPresent()) {
+			Offer offer = OfferConverter.entityToApi(entityOffer.get());
+			return offer;
 		}
 		return null;
 	}
 
-    public boolean updateOffer(UUID id, Offer offer) {
-		offer.setId(id);
-		Optional<Offer> previousOffer = offerRepository.update(offer);
-		if (previousOffer.isPresent()) {
+	public Offer addOffer(final Offer offer) {
+		EntityOffer savedOffer = save(null, offer);
+		return OfferConverter.entityToApi(savedOffer);
+	}
+
+	public boolean updateOffer(final UUID id, final Offer offer) {
+		if (offerRepository.existsById(id)) {
+			save(id, offer);
 			return true;
 		}
 		return false;
 	}
 
-    public boolean deleteOffer(UUID id) {
-    	String idString = id.toString();
-    	if (offerRepository.findById(idString).isPresent()) {
-    		offerRepository.deleteById(idString);
-    		return true;
-    	}
-    	return false;
-    }
+	public boolean deleteOffer(final UUID id) {
+		if (offerRepository.existsById(id)) {
+			offerRepository.deleteById(id);
+			return true;
+		}
+		return false;
+	}
+
+	private EntityOffer save(final UUID id, final Offer offer) {
+		EntityOffer entityOffer = OfferConverter.apiToEntity(offer);
+		removeIds(entityOffer);
+		setPreferenceIds(entityOffer);
+		entityOffer.setId(id);
+		return offerRepository.save(entityOffer);
+	}
+
+	private void removeIds(EntityOffer entityOffer) {
+		removeIds(entityOffer.getOrigin());
+		removeIds(entityOffer.getDestination());
+		removeIds(entityOffer.getContactOptions());
+	}
+
+	private void removeIds(EntityLocation entityLocation) {
+		if (entityLocation != null) {
+			entityLocation.setId(null);
+		}
+	}
+
+	private void removeIds(List<EntityContactOption> entityContactOptions) {
+		if (entityContactOptions != null) {
+			for (EntityContactOption entityContactOption : entityContactOptions) {
+				if (entityContactOption != null) {
+					entityContactOption.setId(null);
+				}
+			}
+		}
+	}
+
+	private void setPreferenceIds(EntityOffer entityOffer) {
+		if (entityOffer.getPreferences() != null) {
+			for (EntityPreference<?> entityPreference : entityOffer.getPreferences()) {
+				if (entityPreference != null) {
+					entityPreference.setId(UUID.randomUUID());
+				}
+			}
+		}
+	}
 }

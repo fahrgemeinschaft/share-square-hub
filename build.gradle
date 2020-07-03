@@ -62,7 +62,6 @@ configurations.all {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.5.1'
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -73,8 +72,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	//implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     
@@ -89,10 +91,10 @@ dependencies {
 	testImplementation 'org.codehaus.groovy:groovy-all:3.0.4'
 	testImplementation 'org.spockframework:spock-spring:2.0-M3-groovy-3.0'
 	testImplementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
-	testImplementation 'com.athaydes:spock-reports:2.0-RC2'
+	//testImplementation 'com.athaydes:spock-reports:2.0-RC2'
 }
 
 test {
 	useJUnitPlatform()
-	systemProperty 'com.athaydes.spockframework.report.showCodeBlocks', true
+	//systemProperty 'com.athaydes.spockframework.report.showCodeBlocks', true
 }

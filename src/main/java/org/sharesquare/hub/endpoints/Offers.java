@@ -8,10 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import org.sharesquare.hub.exception.OfferCreationProblem;
 import org.sharesquare.hub.service.OfferService;
 import org.sharesquare.model.Offer;
-import org.sharesquare.repository.IRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -36,16 +33,12 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/offers")
 public class Offers {
-	
+
     private static final Logger log = LoggerFactory.getLogger(Offers.class);
 
     @Autowired
     OfferService offerService;
-    //TODO: use offerservice, remove offerRepository
 
-    @Autowired
-    private IRepository<Offer> offerRepository;
-    
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -67,22 +60,10 @@ public class Offers {
     @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
     @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Offer> addOffer(@Valid @RequestBody Offer offer) {
-        final Optional<Offer> result = offerRepository.create(offer);
-        if(result.isPresent()) {
-        	return new ResponseEntity<>(result.get(), HttpStatus.CREATED);
-        }else{
-        	// should not be reached
-        	String message = "There was an unexpected problem while creating the Offer: ";
-			try {
-				message += objectMapper.writeValueAsString(offer);
-			} catch (JsonProcessingException e) {
-				log.warn("JSON processing problem: " + e.getMessage());
-			}
-        	log.error(message);
-        	throw new OfferCreationProblem(message);
-        }
-    }
+	public ResponseEntity<Offer> addOffer(@Valid @RequestBody final Offer offer) {
+		final Offer responseOffer = offerService.addOffer(offer);
+		return new ResponseEntity<>(responseOffer, HttpStatus.CREATED);
+	}
 
     @Operation(description = "Update an existing Offer")
     @ApiResponse(responseCode = "200", description = "Success")
@@ -91,7 +72,7 @@ public class Offers {
     @ApiResponse(responseCode = "415", description = "Wrong format")
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateOffer(@PathVariable final UUID id,
-    		                                @Valid @RequestBody Offer offer) {
+    		                                @Valid @RequestBody final Offer offer) {
     	if (offerService.updateOffer(id, offer)) {
     		return ResponseEntity.ok(null);
     	}
@@ -103,7 +84,8 @@ public class Offers {
     		@PageableDefault(page = 0, size = 50) final Pageable pageable) {
 		try {
 			Offer searchOffer = objectMapper.readValue(search, Offer.class);
-			return ResponseEntity.ok(offerRepository.findMany(searchOffer, pageable));
+			//return ResponseEntity.ok(offerRepository.findMany(searchOffer, pageable));
+			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 		} catch (JsonProcessingException e) {
 			log.info("Cannot convert user search to offer object: ", e);
 		}

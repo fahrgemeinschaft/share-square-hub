@@ -1,5 +1,6 @@
 package org.sharesquare.hub.endpoints
 
+import static org.sharesquare.hub.endpoints.OfferUtil.exampleOffer
 import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
 import static org.sharesquare.hub.endpoints.OfferUtil.userId
 import static org.springframework.http.HttpStatus.BAD_REQUEST
@@ -16,13 +17,16 @@ class OfferPostRequestTest extends RequestSpecification {
 
 	@Issue("#4")
 	def "A valid post request should work and return 201"() {
-		given:
-			def offer = new Offer(userId: '1')
-
 		when:
+			def requestOffer = null
+			if (!(offer instanceof Offer)) {
+				requestOffer = fromJson(offer)
+			} else {
+				requestOffer = offer
+			}
 			// StackOverflowError when using groovy.json.JsonOutput.toJson with java.time.ZoneId
 			// https://issues.apache.org/jira/browse/GROOVY-7682
-			final response = doPost(offersUri, toJson(offer))
+			final response = doPost(offersUri, toJson(requestOffer))
 
 		then:
 			resultIs(response, CREATED)
@@ -33,18 +37,21 @@ class OfferPostRequestTest extends RequestSpecification {
 		then:
 			responseOffer.id instanceof UUID
 			responseOffer.id != null
-
-		when:
-			offer.id = responseOffer.id
-
-		then:
-			responseOffer == offer
+			responseOffer == requestOffer
 
 		when:
 			final getResponse = doGet("$offersUri/$responseOffer.id")
+			def getResponseOffer = fromJson(getResponse.contentAsString)
+			getResponseOffer = replaceEmptyListsByNull(getResponseOffer)
 
 		then:
-			fromJson(getResponse.contentAsString) == responseOffer
+			getResponseOffer.id == responseOffer.id
+			getResponseOffer == requestOffer
+
+		where:
+			offer                  | _
+			new Offer(userId: '1') | _
+			exampleOffer           | _
 	}
 
 	def "A post request with an empty body should respond with status code 400 and a meaningful error message"() {
@@ -137,18 +144,16 @@ class OfferPostRequestTest extends RequestSpecification {
 		then:
 			responseOffer.id instanceof UUID
 			responseOffer.id != null
-
-		when:
-			offer.id = responseOffer.id
-
-		then:
 			responseOffer == offer
 
 		when:
 			final getResponse = doUTF8Get("$offersUri/$responseOffer.id")
+			def getResponseOffer = fromJson(getResponse.contentAsString)
+			getResponseOffer = replaceEmptyListsByNull(getResponseOffer)
 
 		then:
-			fromJson(getResponse.contentAsString) == responseOffer
+			getResponseOffer.id == responseOffer.id
+			getResponseOffer == offer
 	}
 
 	def "A post request with startTime and startDate should work and have the default startTimezone in the response"() {
@@ -177,9 +182,11 @@ class OfferPostRequestTest extends RequestSpecification {
 
 		when:
 			final getResponse = doGet("$offersUri/$responseOffer.id")
+			def getResponseOffer = fromJson(getResponse.contentAsString)
+			getResponseOffer = replaceEmptyListsByNull(getResponseOffer)
 
 		then:
-			fromJson(getResponse.contentAsString) == responseOffer
+			getResponseOffer == responseOffer
 	}
 
 	def "A post request with startTimezone should work"() {
@@ -201,9 +208,11 @@ class OfferPostRequestTest extends RequestSpecification {
 
 		when:
 			final getResponse = doGet("$offersUri/$responseOffer.id")
+			def getResponseOffer = fromJson(getResponse.contentAsString)
+			getResponseOffer = replaceEmptyListsByNull(getResponseOffer)
 
 		then:
-			fromJson(getResponse.contentAsString) == responseOffer
+			getResponseOffer == responseOffer
 	}
 
 	def "A post request with an invalid startTime or startDate or startTimezone should respond with status code 400 and a meaningful error message"() {
