@@ -35,19 +35,19 @@ class RequestSpecification extends Specification {
 	@Autowired
 	ObjectMapper objectMapper
 
-	@Value("\${auth.server.token.uri}")
+	@Value("\${custom.auth.server.token.uri}")
 	private String tokenUri;
 
-	@Value("\${auth.server.client.id}")
+	@Value("\${custom.auth.server.client.id}")
 	private String clientId;
 
-	@Value("\${auth.server.client.secret}")
+	@Value("\${custom.auth.server.client.secret}")
 	private String clientSecret;
 
-	@Value("\${auth.server.client.not.in.scope.id}")
+	@Value("\${custom.auth.server.client.not.in.scope.id}")
 	private String clientNotInScopeId;
 
-	@Value("\${auth.server.client.not.in.scope.secret}")
+	@Value("\${custom.auth.server.client.not.in.scope.secret}")
 	private String clientNotInScopeSecret;
 
 	def authServerResponse(id = clientId, secret = clientSecret) {

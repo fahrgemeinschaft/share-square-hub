@@ -51,7 +51,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${SHARE2_USER_ID_CLAIM:user_id}")
     private String userIdClaim;
 
-	@Value("${auth.server.scope}")
+	@Value("${custom.auth.server.scope}")
 	private String scope;
 
 	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
