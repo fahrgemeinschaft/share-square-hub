@@ -40,7 +40,7 @@ public class OfferConverter {
 	private static final Logger log = LoggerFactory.getLogger(OfferConverter.class);
 
 	@Autowired
-    private ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
 	public EntityOffer apiToEntity(Offer offer) {
 		EntityOffer entityOffer = new EntityOffer();
