@@ -54,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Value("${auth.server.scope}")
 	private String scope;
 
-	@Value("${auth.server.issuer.uri}")
+	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
 	private String issuerUri;
 
 	private static final String SCOPE_PREFIX = "SCOPE_";
