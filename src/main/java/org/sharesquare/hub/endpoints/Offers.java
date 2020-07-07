@@ -1,5 +1,6 @@
 package org.sharesquare.hub.endpoints;
 
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
 import static org.sharesquare.hub.exception.ErrorMessage.USER_ID_IS_EMPTY;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -28,7 +29,11 @@ import org.springframework.web.bind.annotation.*;
 import com.sun.xml.bind.v2.TODO;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @ApiResponse(responseCode = "401", description = "Wrong client authorization", content = @Content)
@@ -89,6 +94,12 @@ public class Offers {
     @Operation(description = "Find all Offers for a given userId")
     @ApiResponse(responseCode = "200", description = "Success")
     @ApiResponse(responseCode = "400", description = "Request parameter userId is missing or empty", content = @Content)
+    @Parameters({
+    	@Parameter(in = QUERY, name = "page", schema = @Schema(type = "string")),
+    	@Parameter(in = QUERY, name = "size", schema = @Schema(type = "string")),
+    	@Parameter(in = QUERY, name = "sort", content = @Content(array = @ArraySchema(schema = @Schema(type = "string")))),
+    	@Parameter(in = QUERY, name = "pageable", hidden = true)
+    })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Offer>> getOffers(
 			@RequestParam final String userId,
