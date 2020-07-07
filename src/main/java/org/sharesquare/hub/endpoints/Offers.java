@@ -1,6 +1,7 @@
 package org.sharesquare.hub.endpoints;
 
 
+import static org.sharesquare.hub.exception.ErrorMessage.USER_ID_IS_EMPTY;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+import org.sharesquare.hub.exception.OfferValidationProblem;
 import org.sharesquare.hub.service.OfferService;
 import org.sharesquare.model.Offer;
 import org.slf4j.Logger;
@@ -15,13 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
@@ -38,9 +41,6 @@ public class Offers {
 
     @Autowired
     OfferService offerService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Operation(description = "Get Offer by id")
     @ApiResponse(responseCode = "200", description = "Success")
@@ -79,17 +79,17 @@ public class Offers {
     	return new ResponseEntity<>(NOT_FOUND);
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<Offer>> findMany(@RequestParam final String search,
-    		@PageableDefault(page = 0, size = 50) final Pageable pageable) {
-		try {
-			Offer searchOffer = objectMapper.readValue(search, Offer.class);
-			//return ResponseEntity.ok(offerRepository.findMany(searchOffer, pageable));
-			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-		} catch (JsonProcessingException e) {
-			log.info("Cannot convert user search to offer object: ", e);
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<Offer>> getOffers(
+			@RequestParam final String userId,
+			@PageableDefault(page = 0, size = 10) @SortDefault.SortDefaults({
+					@SortDefault(sort = "startDate", direction = Sort.Direction.ASC),
+					@SortDefault(sort = "startTime", direction = Sort.Direction.ASC)}) final Pageable pageable) {
+    	if (userId.trim().length() > 0) {
+			final Page<Offer> offers = offerService.getOffers(userId, pageable);
+			return ResponseEntity.ok(offers);
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		throw new OfferValidationProblem(USER_ID_IS_EMPTY);
     }
 
     @Operation(description = "Delete an Offer")

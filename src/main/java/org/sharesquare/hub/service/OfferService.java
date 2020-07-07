@@ -6,11 +6,14 @@ import org.sharesquare.hub.model.data.*;
 import org.sharesquare.hub.repository.OfferRepository;
 import org.sharesquare.model.Offer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Service
 public class OfferService {
@@ -40,8 +43,6 @@ public class OfferService {
         */
         return null;
     }
-    //TODO: implement CRUD operations
-    //TODO: implement findMany (call through repository)
 
 	public Offer getOffer(final UUID id) {
 		Optional<EntityOffer> entityOffer = offerRepository.findById(id);
@@ -63,6 +64,17 @@ public class OfferService {
 			return true;
 		}
 		return false;
+	}
+
+	public Page<Offer> getOffers(final String userId, final Pageable pageable) {
+		Page<EntityOffer> entityOffers = offerRepository.findByUserId(userId, pageable);
+		Page<Offer> offers = entityOffers.map(new Function<EntityOffer, Offer>() {
+			@Override
+			public Offer apply(EntityOffer entity) {
+				return OfferConverter.entityToApi(entity);
+			}
+		});
+		return offers;
 	}
 
 	public boolean deleteOffer(final UUID id) {
