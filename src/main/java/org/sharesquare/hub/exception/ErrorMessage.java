@@ -16,4 +16,8 @@ public final class ErrorMessage {
 	public static final String JSON_INVALID_PROBLEM = "Invalid JSON input";
 
 	public static final String OFFER_ID_IS_EMPTY = "Required path variable Offer id is missing";
+
+	public static final String USER_ID_IS_EMPTY = "Request parameter userId must not be empty";
+
+	public static final String ID_OR_USER_ID_IS_EMPTY = "Required path variable id or parameter userId is missing";
 }
