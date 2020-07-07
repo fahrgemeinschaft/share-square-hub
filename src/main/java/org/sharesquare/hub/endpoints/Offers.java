@@ -49,7 +49,7 @@ public class Offers {
     @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing", content = @Content)
     @GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> getOffer(@PathVariable final UUID id) {
-		log.info("Offer GET request for id value '{}'", id);
+    	log.info("Offer GET request for id value '{}'", id);
     	final Offer offer = offerService.getOffer(id);
     	if (offer != null) {
     		return ResponseEntity.ok(offer);
@@ -62,11 +62,11 @@ public class Offers {
     @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
     @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Offer> addOffer(@Valid @RequestBody final Offer offer) {
-		log.info("Offer POST request for Offer instance '{}'", offerConverter.apiToJSONString(offer));
-		final Offer responseOffer = offerService.addOffer(offer);
-		return new ResponseEntity<>(responseOffer, CREATED);
-	}
+    public ResponseEntity<Offer> addOffer(@Valid @RequestBody final Offer offer) {
+    	log.info("Offer POST request for Offer instance '{}'", offerConverter.apiToJSONString(offer));
+    	final Offer responseOffer = offerService.addOffer(offer);
+    	return new ResponseEntity<>(responseOffer, CREATED);
+    }
 
     @Operation(description = "Update an existing Offer")
     @ApiResponse(responseCode = "200", description = "Success")
@@ -95,10 +95,10 @@ public class Offers {
 					@SortDefault(sort = "startTime", direction = Sort.Direction.ASC)}) final Pageable pageable) {
     	log.info("Offer GET request for userId value '{}' and Pageable instance: {}", userId, pageable);
     	if (userId.trim().length() > 0) {
-			final Page<Offer> offers = offerService.getOffers(userId, pageable);
-			return ResponseEntity.ok(offers);
-		}
-		throw new OfferValidationProblem(USER_ID_IS_EMPTY);
+    		final Page<Offer> offers = offerService.getOffers(userId, pageable);
+    		return ResponseEntity.ok(offers);
+    	}
+    	throw new OfferValidationProblem(USER_ID_IS_EMPTY);
     }
 
     @Operation(description = "Delete an Offer")
