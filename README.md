@@ -49,6 +49,6 @@ Use the following settings:
 
 ### Swagger
 
-[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+[http://localhost:8080/api/swagger-ui.html](http://localhost:8080/api/swagger-ui.html)
 
-[http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+[http://localhost:8080/api/v3/api-docs](http://localhost:8080/api/v3/api-docs)
