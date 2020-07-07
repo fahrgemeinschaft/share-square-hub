@@ -28,12 +28,19 @@ import org.sharesquare.model.preferences.PaxSmokerPreference;
 import org.sharesquare.model.preferences.StringPreference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class OfferConverter {
 
 	private static final Logger log = LoggerFactory.getLogger(OfferConverter.class);
+
+	@Autowired
+    private ObjectMapper objectMapper;
 
 	public EntityOffer apiToEntity(Offer offer) {
 		EntityOffer entityOffer = new EntityOffer();
@@ -228,5 +235,14 @@ public class OfferConverter {
 		preference.setKey(entityPreference.getKey());
 		preference.setValue((T) entityPreference.getValue());
 		return preference;
+	}
+
+	public String apiToJSONString(final Offer offer) {
+		try {
+			return objectMapper.writeValueAsString(offer);
+		} catch (JsonProcessingException e) {
+			log.warn("JSON processing problem: " + e.getMessage());
+		}
+		return "";
 	}
 }
