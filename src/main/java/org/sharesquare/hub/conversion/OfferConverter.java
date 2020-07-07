@@ -28,12 +28,14 @@ import org.sharesquare.model.preferences.PaxSmokerPreference;
 import org.sharesquare.model.preferences.StringPreference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+@Service
 public class OfferConverter {
 
 	private static final Logger log = LoggerFactory.getLogger(OfferConverter.class);
 
-	public static EntityOffer apiToEntity(Offer offer) {
+	public EntityOffer apiToEntity(Offer offer) {
 		EntityOffer entityOffer = new EntityOffer();
 		entityOffer.setId(offer.getId());
 		entityOffer.setUserId(offer.getUserId());
@@ -106,7 +108,7 @@ public class OfferConverter {
 		return entityOffer;
 	}
 
-	private static EntityLocation apiToEntity(final Location location) {
+	private EntityLocation apiToEntity(final Location location) {
 		if (location != null) {
 			EntityLocation entityLocation = new EntityLocation();
 			entityLocation.setId(location.getId());
@@ -119,7 +121,7 @@ public class OfferConverter {
 		return null;
 	}
 
-	private static EntityContactOption apiToEntity(final ContactOption contactOption) {
+	private EntityContactOption apiToEntity(final ContactOption contactOption) {
 		EntityContactOption entityContactOption = new EntityContactOption();
 		entityContactOption.setId(contactOption.getId());
 		entityContactOption.setContactType(contactOption.getContactType());
@@ -127,7 +129,7 @@ public class OfferConverter {
 		return entityContactOption;
 	}
 
-	public static Offer entityToApi(final EntityOffer entityOffer) {
+	public Offer entityToApi(final EntityOffer entityOffer) {
 		Offer offer = new Offer();
 		offer.setId(entityOffer.getId());
 		offer.setUserId(entityOffer.getUserId());
@@ -200,7 +202,7 @@ public class OfferConverter {
 		return offer;
 	}
 
-	private static Location entityToApi(final EntityLocation entitylocation) {
+	private Location entityToApi(final EntityLocation entitylocation) {
 		if (entitylocation != null) {
 			Location location = new Location();
 			location.setId(entitylocation.getId());
@@ -213,7 +215,7 @@ public class OfferConverter {
 		return null;
 	}
 
-	private static ContactOption entityToApi(final EntityContactOption entityContactOption) {
+	private ContactOption entityToApi(final EntityContactOption entityContactOption) {
 		ContactOption contactOption = new ContactOption();
 		contactOption.setId(entityContactOption.getId());
 		contactOption.setContactType(entityContactOption.getContactType());
@@ -221,7 +223,7 @@ public class OfferConverter {
 		return contactOption;
 	}
 
-	private static <T> Preference<T> entityToApi(Preference<T> preference, final EntityPreference<?> entityPreference) {
+	private <T> Preference<T> entityToApi(Preference<T> preference, final EntityPreference<?> entityPreference) {
 		preference.setId(entityPreference.getId());
 		preference.setKey(entityPreference.getKey());
 		preference.setValue((T) entityPreference.getValue());

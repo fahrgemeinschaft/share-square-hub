@@ -20,6 +20,9 @@ public class OfferService {
 
     @Autowired
     private OfferRepository offerRepository;
+    
+    @Autowired
+    private OfferConverter offerConverter;
 
     @Autowired
     private ConnectorService connectorService;
@@ -47,7 +50,7 @@ public class OfferService {
 	public Offer getOffer(final UUID id) {
 		Optional<EntityOffer> entityOffer = offerRepository.findById(id);
 		if (entityOffer.isPresent()) {
-			Offer offer = OfferConverter.entityToApi(entityOffer.get());
+			Offer offer = offerConverter.entityToApi(entityOffer.get());
 			return offer;
 		}
 		return null;
@@ -55,7 +58,7 @@ public class OfferService {
 
 	public Offer addOffer(final Offer offer) {
 		EntityOffer savedOffer = save(null, offer);
-		return OfferConverter.entityToApi(savedOffer);
+		return offerConverter.entityToApi(savedOffer);
 	}
 
 	public boolean updateOffer(final UUID id, final Offer offer) {
@@ -71,7 +74,7 @@ public class OfferService {
 		Page<Offer> offers = entityOffers.map(new Function<EntityOffer, Offer>() {
 			@Override
 			public Offer apply(EntityOffer entity) {
-				return OfferConverter.entityToApi(entity);
+				return offerConverter.entityToApi(entity);
 			}
 		});
 		return offers;
@@ -86,7 +89,7 @@ public class OfferService {
 	}
 
 	private EntityOffer save(final UUID id, final Offer offer) {
-		EntityOffer entityOffer = OfferConverter.apiToEntity(offer);
+		EntityOffer entityOffer = offerConverter.apiToEntity(offer);
 		removeIds(entityOffer);
 		setPreferenceIds(entityOffer);
 		entityOffer.setId(id);
