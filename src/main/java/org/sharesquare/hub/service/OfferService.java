@@ -1,5 +1,9 @@
 package org.sharesquare.hub.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
 
 import org.sharesquare.hub.conversion.OfferConverter;
 import org.sharesquare.hub.model.data.*;
@@ -9,11 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
 
 @Service
 public class OfferService {
