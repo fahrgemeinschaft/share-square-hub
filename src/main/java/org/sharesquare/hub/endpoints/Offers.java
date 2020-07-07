@@ -1,13 +1,14 @@
 package org.sharesquare.hub.endpoints;
 
-
 import static org.sharesquare.hub.exception.ErrorMessage.USER_ID_IS_EMPTY;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.util.UUID;
+
+import javax.validation.Valid;
 
 import org.sharesquare.hub.exception.OfferValidationProblem;
 import org.sharesquare.hub.service.OfferService;
@@ -20,14 +21,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
-import javax.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @ApiResponse(responseCode = "401", description = "Wrong client authorization", content = @Content)
 @ApiResponse(responseCode = "403", description = "Client not allowed", content = @Content)
@@ -44,7 +43,7 @@ public class Offers {
     @ApiResponse(responseCode = "200", description = "Success")
     @ApiResponse(responseCode = "404", description = "Offer doesn't exist", content = @Content)
     @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing", content = @Content)
-    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> getOffer(@PathVariable final UUID id) {
     	final Offer offer = offerService.getOffer(id);
     	if (offer != null) {
@@ -57,10 +56,10 @@ public class Offers {
     @ApiResponse(responseCode = "201", description = "Success")
     @ApiResponse(responseCode = "400", description = "Wrong data input", content = @Content)
     @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	public ResponseEntity<Offer> addOffer(@Valid @RequestBody final Offer offer) {
 		final Offer responseOffer = offerService.addOffer(offer);
-		return new ResponseEntity<>(responseOffer, HttpStatus.CREATED);
+		return new ResponseEntity<>(responseOffer, CREATED);
 	}
 
     @Operation(description = "Update an existing Offer")
@@ -68,7 +67,7 @@ public class Offers {
     @ApiResponse(responseCode = "404", description = "Offer doesn't exist")
     @ApiResponse(responseCode = "400", description = "Wrong data input")
     @ApiResponse(responseCode = "415", description = "Wrong format")
-    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateOffer(@PathVariable final UUID id,
     		                                @Valid @RequestBody final Offer offer) {
     	if (offerService.updateOffer(id, offer)) {
@@ -80,7 +79,7 @@ public class Offers {
     @Operation(description = "Find all Offers for a given userId")
     @ApiResponse(responseCode = "200", description = "Success")
     @ApiResponse(responseCode = "400", description = "Request parameter userId is missing or empty", content = @Content)
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Offer>> getOffers(
 			@RequestParam final String userId,
 			@PageableDefault(page = 0, size = 10) @SortDefault.SortDefaults({
@@ -97,7 +96,7 @@ public class Offers {
     @ApiResponse(responseCode = "204", description = "No content success")
     @ApiResponse(responseCode = "404", description = "Offer doesn't exist")
     @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing")
-    @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteOffer(@PathVariable final UUID id) {
     	if (offerService.deleteOffer(id)) {
     		return new ResponseEntity<>(NO_CONTENT);
