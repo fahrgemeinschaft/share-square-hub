@@ -46,3 +46,9 @@ Use the following settings:
 **JDBC URL:** jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1  
 **User Name:** sa  
 **Password:**
+
+### Swagger
+
+[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+[http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
