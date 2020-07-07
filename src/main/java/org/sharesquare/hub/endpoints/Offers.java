@@ -77,6 +77,9 @@ public class Offers {
     	return new ResponseEntity<>(NOT_FOUND);
     }
 
+    @Operation(description = "Find all Offers for a given userId")
+    @ApiResponse(responseCode = "200", description = "Success")
+    @ApiResponse(responseCode = "400", description = "Request parameter userId is missing or empty", content = @Content)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Offer>> getOffers(
 			@RequestParam final String userId,
