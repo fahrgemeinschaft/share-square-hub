@@ -136,6 +136,19 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
+	def doGet(uri, name1, value1, name2 = ' ', value2 = '', name3 = ' ', value3 = '') {
+		mvc.perform(
+				get(uri)
+					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.param(name1, value1)
+					.param(name2, value2)
+					.param(name3, value3)
+			)
+			.andDo(print())
+			.andReturn()
+			.response
+	}
+
 	def doUTF8Get(uri) {
 		mvc.perform(
 				get(uri)
@@ -221,5 +234,11 @@ class RequestSpecification extends Specification {
 			}
 			assert path == uri
 		}
+	}
+
+	void contentSizeIs(response, size) {
+		assert response != null
+		assert response.content != null
+		assert response.content.size() == size
 	}
 }

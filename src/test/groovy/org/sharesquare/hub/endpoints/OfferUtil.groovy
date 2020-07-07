@@ -6,6 +6,10 @@ class OfferUtil {
 
 	protected static final userId = 'userId'
 
+	protected static final size = 'size'
+
+	protected static final page = 'page'
+
 	protected static final defaultOffer = '{}'
 
 	protected static final exampleOffer = '''

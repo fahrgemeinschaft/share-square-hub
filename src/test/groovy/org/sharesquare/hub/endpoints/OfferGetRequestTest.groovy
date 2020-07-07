@@ -54,6 +54,6 @@ class OfferGetRequestTest extends RequestSpecification {
 		where:
 			id        | expectedMessage
 			'invalid' | "Type mismatch for path variable: Invalid UUID string: $id"
-			''        | 'Required path variable Offer id is missing'
+			''        | 'Required path variable id or parameter userId is missing'
 	}
 }
