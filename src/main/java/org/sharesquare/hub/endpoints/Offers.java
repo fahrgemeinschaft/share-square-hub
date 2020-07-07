@@ -25,6 +25,8 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.sun.xml.bind.v2.TODO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -93,6 +95,7 @@ public class Offers {
 			@PageableDefault(page = 0, size = 10) @SortDefault.SortDefaults({
 					@SortDefault(sort = "startDate", direction = Sort.Direction.ASC),
 					@SortDefault(sort = "startTime", direction = Sort.Direction.ASC)}) final Pageable pageable) {
+    	TODO.checkSpec("https://github.com/fahrgemeinschaft/share-square-hub/issues/24");
     	log.info("Offer GET request for userId value '{}' and Pageable instance: {}", userId, pageable);
     	if (userId.trim().length() > 0) {
     		final Page<Offer> offers = offerService.getOffers(userId, pageable);
