@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
+import org.sharesquare.hub.conversion.OfferConverter;
 import org.sharesquare.hub.exception.OfferValidationProblem;
 import org.sharesquare.hub.service.OfferService;
 import org.sharesquare.model.Offer;
@@ -39,12 +40,16 @@ public class Offers {
     @Autowired
     OfferService offerService;
 
+    @Autowired
+    private OfferConverter offerConverter;
+
     @Operation(description = "Get Offer by id")
     @ApiResponse(responseCode = "200", description = "Success")
     @ApiResponse(responseCode = "404", description = "Offer doesn't exist", content = @Content)
     @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing", content = @Content)
     @GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Offer> getOffer(@PathVariable final UUID id) {
+		log.info("Offer GET request for id value '{}'", id);
     	final Offer offer = offerService.getOffer(id);
     	if (offer != null) {
     		return ResponseEntity.ok(offer);
@@ -58,6 +63,7 @@ public class Offers {
     @ApiResponse(responseCode = "415", description = "Wrong format", content = @Content)
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	public ResponseEntity<Offer> addOffer(@Valid @RequestBody final Offer offer) {
+		log.info("Offer POST request for Offer instance '{}'", offerConverter.apiToJSONString(offer));
 		final Offer responseOffer = offerService.addOffer(offer);
 		return new ResponseEntity<>(responseOffer, CREATED);
 	}
@@ -70,6 +76,8 @@ public class Offers {
     @PutMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateOffer(@PathVariable final UUID id,
     		                                @Valid @RequestBody final Offer offer) {
+    	log.info("Offer PUT request for id value '{}' and Offer instance '{}'",
+    			id, offerConverter.apiToJSONString(offer));
     	if (offerService.updateOffer(id, offer)) {
     		return ResponseEntity.ok(null);
     	}
@@ -85,6 +93,7 @@ public class Offers {
 			@PageableDefault(page = 0, size = 10) @SortDefault.SortDefaults({
 					@SortDefault(sort = "startDate", direction = Sort.Direction.ASC),
 					@SortDefault(sort = "startTime", direction = Sort.Direction.ASC)}) final Pageable pageable) {
+    	log.info("Offer GET request for userId value '{}' and Pageable instance: {}", userId, pageable);
     	if (userId.trim().length() > 0) {
 			final Page<Offer> offers = offerService.getOffers(userId, pageable);
 			return ResponseEntity.ok(offers);
@@ -98,6 +107,7 @@ public class Offers {
     @ApiResponse(responseCode = "400", description = "Path variable Offer id is invalid or missing")
     @DeleteMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteOffer(@PathVariable final UUID id) {
+    	log.info("Offer DELETE request for id value '{}'", id);
     	if (offerService.deleteOffer(id)) {
     		return new ResponseEntity<>(NO_CONTENT);
     	}
