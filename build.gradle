@@ -32,7 +32,7 @@ if (repoPassword == null) repoPassword = properties.getProperty('repo.password')
 
 repositories {
     mavenCentral()
-
+	// mavenLocal()
     maven {
         url = repoUrl
         credentials {
