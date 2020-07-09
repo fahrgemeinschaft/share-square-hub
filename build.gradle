@@ -31,6 +31,9 @@ repositories {
             username = nexusUser
             password = nexusPass
         }
+        content {
+            includeGroup 'org.sharesquare.commons'
+        }
     }
 }
 
