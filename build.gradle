@@ -14,9 +14,9 @@ configurations {
 }
 
 // read environment variables
-def nexusUrl = System.getenv("NEXUS_URL")
-def nexusUser = System.getenv("NEXUS_USER")
-def nexusPass = System.getenv("NEXUS_PASS")
+def repoUrl = System.getenv("REPO_URL")
+def repoUsername = System.getenv("REPO_USERNAME")
+def repoPassword = System.getenv("REPO_PASSWORD")
 
 // read local.properties file
 Properties properties = new Properties()
@@ -26,18 +26,18 @@ if (propertiesFile.exists()) {
 }
 
 // environment variables overwrite local properties
-if (nexusUrl == null) nexusUrl = properties.getProperty('nexus.url')
-if (nexusUser == null) nexusUser = properties.getProperty('nexus.user')
-if (nexusPass == null) nexusPass = properties.getProperty('nexus.pass')
+if (repoUrl == null) repoUrl = properties.getProperty('repo.url')
+if (repoUsername == null) repoUsername = properties.getProperty('repo.username')
+if (repoPassword == null) repoPassword = properties.getProperty('repo.password')
 
 repositories {
     mavenCentral()
 
     maven {
-        url = nexusUrl
+        url = repoUrl
         credentials {
-            username = nexusUser
-            password = nexusPass
+            username = repoUsername
+            password = repoPassword
         }
         content {
             includeGroup 'org.sharesquare.commons'
