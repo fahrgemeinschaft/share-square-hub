@@ -1,16 +1,29 @@
 # share-square-hub
 
-### Short Description
-
 The hub allows different client systems to provide trip offer data to a selection of registered target systems.
 
 ### Deployment
 
+Define your maven repository properties in the **local.properties** file where the library 'share-square-commons' can be found:
+
+* repo.url
+* repo.username
+* repo.password
+
+or use environment variables:
+
+* REPO_URL
+* REPO_USERNAME
+* REPO_PASSWORD
+
+
+Alternatively install the library 'share-square-commons' into your local repository and use `mavenLocal()` in your **build.gradle** instead.
+
 Define authorization properties in the **application.properties** file:
 
-* auth.server.domain
-* auth.server.realm
-* auth.server.scope
+* custom.auth.server.domain
+* custom.auth.server.realm
+* custom.auth.server.scope
 
 or use environment variables:
 
@@ -58,6 +71,6 @@ Use the following settings:
 
 ### Actuator
 
-Endpoints like:
+Endpoints like:  
 [http://localhost:8080/api/actuator/health](http://localhost:8080/api/actuator/health)  
 [http://localhost:8080/api/actuator/beans](http://localhost:8080/api/actuator/beans)
