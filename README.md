@@ -36,7 +36,7 @@ Authorize request with header `"Authorization: Bearer {access_token}"`
 
 ### Datasource
 
-The Application runs with a H2 in-memory database. The database web console can be accessed at [http://localhost:8080/h2-console](http://localhost:8080/h2-console).
+The Application runs with a H2 in-memory database. The database web console can be accessed at   [http://localhost:8080/h2-console](http://localhost:8080/h2-console).
 
 Use the following settings:
 
@@ -49,6 +49,11 @@ Use the following settings:
 
 ### Swagger
 
-[http://localhost:8080/api/swagger-ui.html](http://localhost:8080/api/swagger-ui.html)
-
+[http://localhost:8080/api/swagger-ui.html](http://localhost:8080/api/swagger-ui.html)  
 [http://localhost:8080/api/v3/api-docs](http://localhost:8080/api/v3/api-docs)
+
+### Actuator
+
+Endpoints like:
+[http://localhost:8080/api/actuator/health](http://localhost:8080/api/actuator/health)  
+[http://localhost:8080/api/actuator/beans](http://localhost:8080/api/actuator/beans)
