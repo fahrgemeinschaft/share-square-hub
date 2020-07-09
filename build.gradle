@@ -34,25 +34,6 @@ repositories {
     }
 }
 
-sourceSets {
-    main {
-        java {
-        	srcDirs= ['src/main/java']
-        }
-        resources {
-        	srcDirs= ['src/main/resources']
-        }
-    }
-    test {
-        java {
-        	srcDirs= ['src/test/java','src/test/groovy']
-        }
-        resources {
-        	srcDirs= ['src/test/resources']
-        }
-    }
-}
-
 configurations.all {
     // Check for updates every build
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
