@@ -13,14 +13,22 @@ configurations {
 	}
 }
 
+// read environment variables
+def nexusUrl = System.getenv("NEXUS_URL")
+def nexusUser = System.getenv("NEXUS_USER")
+def nexusPass = System.getenv("NEXUS_PASS")
+
+// read local.properties file
 Properties properties = new Properties()
 def propertiesFile = project.rootProject.file('local.properties')
 if (propertiesFile.exists()) {
     properties.load(propertiesFile.newDataInputStream())
 }
-def nexusUrl = properties.getProperty('nexus.url') != null ? properties.getProperty('nexus.url') : System.getenv("NEXUS_URL")
-def nexusUser = properties.getProperty('nexus.user') != null ? properties.getProperty('nexus.user') : System.getenv("NEXUS_USER")
-def nexusPass = properties.getProperty('nexus.pass') != null ? properties.getProperty('nexus.pass') : System.getenv("NEXUS_PASS")
+
+// environment variables overwrite local properties
+if (nexusUrl == null) nexusUrl = properties.getProperty('nexus.url')
+if (nexusUser == null) nexusUser = properties.getProperty('nexus.user')
+if (nexusPass == null) nexusPass = properties.getProperty('nexus.pass')
 
 repositories {
     mavenCentral()
