@@ -34,11 +34,6 @@ repositories {
     }
 }
 
-configurations.all {
-    // Check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
@@ -56,7 +51,7 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     
-    implementation group: 'org.sharesquare.commons', name: 'share-square-commons', version: "0.0.1-SNAPSHOT", changing: true
+    implementation 'org.sharesquare.commons:share-square-commons:0.0.1-SNAPSHOT'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
