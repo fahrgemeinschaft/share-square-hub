@@ -16,7 +16,6 @@ or use environment variables:
 * REPO_USERNAME
 * REPO_PASSWORD
 
-
 Alternatively install the library 'share-square-commons' into your local repository and use `mavenLocal()` in your **build.gradle** instead.
 
 Define authorization properties in the **application.properties** file:
