@@ -1,5 +1,9 @@
 # share-square-hub
 
+### Short Description
+
+The hub allows different client systems to provide trip offer data to a selection of registered target systems.
+
 ### Deployment
 
 Define authorization properties in the **application.properties** file:
