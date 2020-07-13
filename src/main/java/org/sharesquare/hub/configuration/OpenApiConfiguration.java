@@ -35,9 +35,7 @@ public class OpenApiConfiguration {
 				.type(SecurityScheme.Type.HTTP)
 				.scheme("bearer")
 				.bearerFormat("JWT")
-				.name(Constants.AUTHORIZATION_HEADER_NAME)
 				.description(
-						"Authorization header using the Bearer scheme <b>\"Authorization: Bearer &lt;Value&gt;\"</b> where Value is the access token.")
-				.in(SecurityScheme.In.HEADER);
+						"Authorization header using the Bearer scheme <b>\"Authorization: Bearer &lt;Value&gt;\"</b> where Value is the access token.");
 	}
 }
