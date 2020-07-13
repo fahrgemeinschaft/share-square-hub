@@ -17,7 +17,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 public class OpenApiConfiguration {
 
-	private static final String AUTH = "OAuth 2.0";
+	private static final String AUTH = "OAuth2.0";
 
     @Bean
     public OpenAPI customOpenAPI() {
