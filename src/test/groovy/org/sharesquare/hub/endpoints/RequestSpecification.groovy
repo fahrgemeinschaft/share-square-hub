@@ -35,19 +35,19 @@ class RequestSpecification extends Specification {
 	@Autowired
 	ObjectMapper objectMapper
 
-	@Value("\${auth.server.token.uri}")
+	@Value("\${custom.auth.server.token.uri}")
 	private String tokenUri;
 
-	@Value("\${auth.server.client.id}")
+	@Value("\${custom.auth.server.client.id}")
 	private String clientId;
 
-	@Value("\${auth.server.client.secret}")
+	@Value("\${custom.auth.server.client.secret}")
 	private String clientSecret;
 
-	@Value("\${auth.server.client.not.in.scope.id}")
+	@Value("\${custom.auth.server.client.not.in.scope.id}")
 	private String clientNotInScopeId;
 
-	@Value("\${auth.server.client.not.in.scope.secret}")
+	@Value("\${custom.auth.server.client.not.in.scope.secret}")
 	private String clientNotInScopeSecret;
 
 	def authServerResponse(id = clientId, secret = clientSecret) {
@@ -130,6 +130,19 @@ class RequestSpecification extends Specification {
 		mvc.perform(
 				get(uri)
 					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+			)
+			.andDo(print())
+			.andReturn()
+			.response
+	}
+
+	def doGet(uri, name1, value1, name2 = ' ', value2 = '', name3 = ' ', value3 = '') {
+		mvc.perform(
+				get(uri)
+					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.param(name1, value1)
+					.param(name2, value2)
+					.param(name3, value3)
 			)
 			.andDo(print())
 			.andReturn()
@@ -221,5 +234,11 @@ class RequestSpecification extends Specification {
 			}
 			assert path == uri
 		}
+	}
+
+	void contentSizeIs(response, size) {
+		assert response != null
+		assert response.content != null
+		assert response.content.size() == size
 	}
 }

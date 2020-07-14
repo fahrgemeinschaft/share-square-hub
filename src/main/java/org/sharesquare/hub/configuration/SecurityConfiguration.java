@@ -10,11 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
@@ -51,10 +49,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${SHARE2_USER_ID_CLAIM:user_id}")
     private String userIdClaim;
 
-	@Value("${auth.server.scope}")
+	@Value("${custom.auth.server.scope}")
 	private String scope;
 
-	@Value("${auth.server.issuer.uri}")
+	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
 	private String issuerUri;
 
 	private static final String SCOPE_PREFIX = "SCOPE_";
@@ -92,23 +90,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 
 	@Override
-	public void configure(WebSecurity web) {
-		web.ignoring().mvcMatchers(
-				// Swagger UI
-				"/v3/api-docs/**", 
-				"/swagger-ui.html", 
-				"/swagger-ui/**",
-				// H2 Web Console
-				"/h2-console/**",
-				"/error/**",
-				"/favicon.ico");
-	}
-
-	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.csrf(csrf -> csrf.disable())
 			.authorizeRequests(authorize -> authorize
+				.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui").permitAll() // Swagger UI
+				.antMatchers("/h2-console/**").permitAll() // H2 Web Console
+				.antMatchers("/actuator/**").permitAll()
 				.mvcMatchers("/offers/**").hasAuthority(SCOPE_PREFIX + scope)
 				.anyRequest().authenticated()
 			)
@@ -121,6 +109,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		BearerTokenAuthenticationFilter filter = new BearerTokenAuthenticationFilter(authenticationManagerBean());
 		filter.setAuthenticationFailureHandler(authenticationFailureHandler());
 		http.addFilterBefore(filter, BearerTokenAuthenticationFilter.class);
+
+		http.headers().frameOptions().disable(); // for H2 Web Console
     }
         /*
         http

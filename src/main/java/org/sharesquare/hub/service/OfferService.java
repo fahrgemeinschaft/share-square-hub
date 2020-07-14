@@ -1,22 +1,27 @@
 package org.sharesquare.hub.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
 
 import org.sharesquare.hub.conversion.OfferConverter;
 import org.sharesquare.hub.model.data.*;
 import org.sharesquare.hub.repository.OfferRepository;
 import org.sharesquare.model.Offer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class OfferService {
 
     @Autowired
     private OfferRepository offerRepository;
+    
+    @Autowired
+    private OfferConverter offerConverter;
 
     @Autowired
     private ConnectorService connectorService;
@@ -40,13 +45,11 @@ public class OfferService {
         */
         return null;
     }
-    //TODO: implement CRUD operations
-    //TODO: implement findMany (call through repository)
 
 	public Offer getOffer(final UUID id) {
 		Optional<EntityOffer> entityOffer = offerRepository.findById(id);
 		if (entityOffer.isPresent()) {
-			Offer offer = OfferConverter.entityToApi(entityOffer.get());
+			Offer offer = offerConverter.entityToApi(entityOffer.get());
 			return offer;
 		}
 		return null;
@@ -54,7 +57,7 @@ public class OfferService {
 
 	public Offer addOffer(final Offer offer) {
 		EntityOffer savedOffer = save(null, offer);
-		return OfferConverter.entityToApi(savedOffer);
+		return offerConverter.entityToApi(savedOffer);
 	}
 
 	public boolean updateOffer(final UUID id, final Offer offer) {
@@ -63,6 +66,17 @@ public class OfferService {
 			return true;
 		}
 		return false;
+	}
+
+	public Page<Offer> getOffers(final String userId, final Pageable pageable) {
+		Page<EntityOffer> entityOffers = offerRepository.findByUserId(userId, pageable);
+		Page<Offer> offers = entityOffers.map(new Function<EntityOffer, Offer>() {
+			@Override
+			public Offer apply(EntityOffer entity) {
+				return offerConverter.entityToApi(entity);
+			}
+		});
+		return offers;
 	}
 
 	public boolean deleteOffer(final UUID id) {
@@ -74,7 +88,7 @@ public class OfferService {
 	}
 
 	private EntityOffer save(final UUID id, final Offer offer) {
-		EntityOffer entityOffer = OfferConverter.apiToEntity(offer);
+		EntityOffer entityOffer = offerConverter.apiToEntity(offer);
 		removeIds(entityOffer);
 		setPreferenceIds(entityOffer);
 		entityOffer.setId(id);

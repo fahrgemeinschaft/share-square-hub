@@ -22,8 +22,7 @@ public class SystemConfiguration {
 
     private String appName;
 
-
-    @Value("${data.example.usage}")
+    @Value("${custom.data.example.usage}")
 	private boolean useExamples;
 
     @Bean

@@ -1,5 +1,6 @@
 package org.sharesquare.hub.exception;
 
+import static org.sharesquare.hub.exception.ErrorMessage.ID_OR_USER_ID_IS_EMPTY;
 import static org.sharesquare.hub.exception.ErrorMessage.JSON_INVALID_PROBLEM;
 import static org.sharesquare.hub.exception.ErrorMessage.JSON_PARSE_ERROR;
 import static org.sharesquare.hub.exception.ErrorMessage.OFFER_ID_IS_EMPTY;
@@ -25,6 +26,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -101,7 +103,7 @@ public class OfferResponseEntityExceptionHandler {
 	public ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, WebRequest request) {
 		String message = ex.getMessage();
 		HttpStatus status = UNSUPPORTED_MEDIA_TYPE;
-		if (requestHasEmptyPathVariable(request)) {
+		if (requestHasEmptyPathVariable(request) != null) {
 			message = OFFER_ID_IS_EMPTY;
 			status = BAD_REQUEST;
 		}
@@ -113,7 +115,7 @@ public class OfferResponseEntityExceptionHandler {
 	public ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, WebRequest request) {
 		String message = ex.getMessage();
 		HttpStatus status = METHOD_NOT_ALLOWED;
-		if (requestHasEmptyPathVariable(request)) {
+		if (requestHasEmptyPathVariable(request) != null) {
 			message = OFFER_ID_IS_EMPTY;
 			status = BAD_REQUEST;
 		}
@@ -121,14 +123,33 @@ public class OfferResponseEntityExceptionHandler {
 		return new ResponseEntity<>(new ResponseError(status, message, request), status);
 	}
 
-	private boolean requestHasEmptyPathVariable(WebRequest request) {
-		HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
-		if ((httpServletRequest.getMethod().equals("GET")
-				|| httpServletRequest.getMethod().equals("PUT")
-				|| httpServletRequest.getMethod().equals("DELETE"))
-				&& httpServletRequest.getRequestURI().equals("/offers/")) {
-			return true;
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	public ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+			WebRequest request) {
+		String message = ex.getMessage();
+		String method = requestHasEmptyPathVariable(request);
+		if (method != null && method.equals("GET")) {
+			message = ID_OR_USER_ID_IS_EMPTY;
 		}
-		return false;
+		log.info("Wrong client request (missing servlet request parameter): " + message);
+		return new ResponseEntity<>(new ResponseError(BAD_REQUEST, message, request), BAD_REQUEST);
+	}
+
+	@ExceptionHandler(OfferValidationProblem.class)
+	public ResponseEntity<Object> handleOfferValidationProblem(OfferValidationProblem ex, WebRequest request) {
+		log.info("Wrong client request (Offer validation problem): " + ex.getMessage());
+		return new ResponseEntity<>(new ResponseError(BAD_REQUEST, ex.getMessage(), request), BAD_REQUEST);
+	}
+
+	private String requestHasEmptyPathVariable(WebRequest request) {
+		HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
+		String method = httpServletRequest.getMethod();
+		if ((method.equals("GET")
+				|| method.equals("PUT")
+				|| method.equals("DELETE"))
+				&& httpServletRequest.getRequestURI().trim().matches("\\/offers\\/?")) {
+			return method;
+		}
+		return null;
 	}
 }

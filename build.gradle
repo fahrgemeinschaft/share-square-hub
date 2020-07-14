@@ -1,13 +1,11 @@
 plugins {
-    id "io.freefair.lombok" version "4.1.5"
     id 'org.springframework.boot' version '2.3.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
 	id 'groovy'
 }
 
-sourceCompatibility = 8
-targetCompatibility = 8
+sourceCompatibility = '1.8'
 
 configurations {
 	compileOnly {
@@ -15,59 +13,43 @@ configurations {
 	}
 }
 
+// read environment variables
+def repoUrl = System.getenv("REPO_URL")
+def repoUsername = System.getenv("REPO_USERNAME")
+def repoPassword = System.getenv("REPO_PASSWORD")
+
+// read local.properties file
 Properties properties = new Properties()
 def propertiesFile = project.rootProject.file('local.properties')
 if (propertiesFile.exists()) {
     properties.load(propertiesFile.newDataInputStream())
 }
-def nexusUrl = properties.getProperty('nexus.url') != null ? properties.getProperty('nexus.url') : System.getenv("NEXUS_URL")
-def nexusUser = properties.getProperty('nexus.user') != null ? properties.getProperty('nexus.user') : System.getenv("NEXUS_USER")
-def nexusPass = properties.getProperty('nexus.pass') != null ? properties.getProperty('nexus.pass') : System.getenv("NEXUS_PASS")
+
+// environment variables overwrite local properties
+if (repoUrl == null) repoUrl = properties.getProperty('repo.url')
+if (repoUsername == null) repoUsername = properties.getProperty('repo.username')
+if (repoPassword == null) repoPassword = properties.getProperty('repo.password')
 
 repositories {
     mavenCentral()
-
+	// mavenLocal()
     maven {
-        url = nexusUrl
+        url = repoUrl
         credentials {
-            username = nexusUser
-            password = nexusPass
+            username = repoUsername
+            password = repoPassword
+        }
+        content {
+            includeGroup 'org.sharesquare.commons'
         }
     }
-}
-
-sourceSets {
-    main {
-        java {
-        	srcDirs= ['src/main/java']
-        }
-        resources {
-        	srcDirs= ['src/main/resources']
-        }
-    }
-    test {
-        java {
-        	srcDirs= ['src/test/java','src/test/groovy']
-        }
-        resources {
-        	srcDirs= ['src/test/resources']
-        }
-    }
-}
-
-configurations.all {
-    // Check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.4.1'
-    implementation 'org.springframework.data:spring-data-commons:2.3.1.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.3.1.RELEASE'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.4.3'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
@@ -80,7 +62,7 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     
-    implementation group: 'org.sharesquare.commons', name: 'share-square-commons', version: "0.0.1-SNAPSHOT", changing: true
+    implementation 'org.sharesquare.commons:share-square-commons:0.0.2-SNAPSHOT'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

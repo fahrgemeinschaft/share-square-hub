@@ -20,7 +20,7 @@ class AuthTest extends RequestSpecification {
 
 	@Shared token
 
-	@Value("\${token.expired}")
+	@Value("\${custom.token.expired}")
 	private String tokenExpired;
 
 	static final tokenPattern = /(?i)([a-z0-9]+\.){2}[a-z0-9\_\-]+/

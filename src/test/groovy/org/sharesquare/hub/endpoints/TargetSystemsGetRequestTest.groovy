@@ -29,13 +29,13 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 			responseTargetSystems.size() == 3
 			names == ['Fahrgemeinschaft.de', 'ride2Go', 'Mitfahrzentrale MiFaZ'] as Set
 			responseTargetSystems.each {
-				it.id instanceof UUID
-				it.id != null
-				it.description instanceof String
-				it.description != null
-				it.description != ''
-				it.vanityUrl instanceof URL
-				it.vanityUrl != null
+				assert it.id instanceof UUID
+				assert it.id != null
+				assert it.description instanceof String
+				assert it.description != null
+				assert it.description != ''
+				assert it.vanityUrl instanceof URL
+				assert it.vanityUrl != null
 			}
 	}
 }
