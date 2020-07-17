@@ -26,7 +26,7 @@ public class TargetSystems {
     @GetMapping(path="/targetsystems", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<TargetSystem>> getTargetSystems() {
         List<TargetSystem> targetSystems =
-                connectorRepo.getAll().stream().map(c->c.getTargetSystem()).collect(Collectors.toList());
+                null;//connectorRepo.getAll().stream().map(c->c.getTargetSystem()).collect(Collectors.toList());
         return ResponseEntity.ok(targetSystems);
     }
 

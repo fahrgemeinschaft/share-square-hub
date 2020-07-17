@@ -30,7 +30,7 @@ public final class ExampleData {
 			exampleTargetSystem.setVanityUrl(new URL("http://www.fahrgemeinschaft.de"));
 
 			Connector exampleConnector = new Connector();
-			exampleConnector.setTargetSystem(exampleTargetSystem);
+			//exampleConnector.setTargetSystem(exampleTargetSystem);
 			exampleConnector.setAliveCheckWebhook(new URL("https://www.fahrgemeinschaft.de/api/alivecheck"));
 			exampleConnector.setOfferUpdateWebhook(new URL("https://www.fahrgemeinschaft.de/api/offers"));
 
@@ -43,7 +43,7 @@ public final class ExampleData {
 			exampleTargetSystem.setVanityUrl(new URL("http://www.ride2go.com"));
 
 			exampleConnector = new Connector();
-			exampleConnector.setTargetSystem(exampleTargetSystem);
+			//exampleConnector.setTargetSystem(exampleTargetSystem);
 			exampleConnector.setAliveCheckWebhook(new URL("https://www.ride2go.com/api/alivecheck"));
 			exampleConnector.setOfferUpdateWebhook(new URL("https://www.ride2go.com/api/offers"));
 
@@ -56,7 +56,7 @@ public final class ExampleData {
 			exampleTargetSystem.setVanityUrl(new URL("http://www.mifaz.de"));
 
 			exampleConnector = new Connector();
-			exampleConnector.setTargetSystem(exampleTargetSystem);
+			//exampleConnector.setTargetSystem(exampleTargetSystem);
 			exampleConnector.setAliveCheckWebhook(new URL("https://www.mifaz.de/api/alivecheck"));
 			exampleConnector.setOfferUpdateWebhook(new URL("https://www.mifaz.de/api/offers"));
 
