@@ -94,10 +94,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http
 			.csrf(csrf -> csrf.disable())
 			.authorizeRequests(authorize -> authorize
-				.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui").permitAll() // Swagger UI
+				.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Swagger UI
 				.antMatchers("/h2-console/**").permitAll() // H2 Web Console
 				.antMatchers("/actuator/**").permitAll()
-				.mvcMatchers("/offers/**").hasAuthority(SCOPE_PREFIX + scope)
+				.mvcMatchers("/offers/**", "/targetSystems/**").hasAuthority(SCOPE_PREFIX + scope)
 				.anyRequest().authenticated()
 			)
 			.exceptionHandling()
