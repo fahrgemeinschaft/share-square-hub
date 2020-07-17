@@ -1,9 +1,9 @@
 package org.sharesquare.hub.endpoints
 
-import static org.sharesquare.hub.endpoints.OfferUtil.userId
-import static org.sharesquare.hub.endpoints.OfferUtil.size
-import static org.sharesquare.hub.endpoints.OfferUtil.page
 import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
+import static org.sharesquare.hub.endpoints.OfferUtil.page
+import static org.sharesquare.hub.endpoints.OfferUtil.size
+import static org.sharesquare.hub.endpoints.OfferUtil.userId
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.OK
 
@@ -19,9 +19,9 @@ class OffersGetRequestTest extends RequestSpecification {
 			String userC = 'c'
 
 		when:
-			String id1 = fromJson(doPost(offersUri, toJson([userId: userA])).contentAsString).id
-			String id2 = fromJson(doPost(offersUri, toJson([userId: userA])).contentAsString).id
-			String id3 = fromJson(doPost(offersUri, toJson([userId: userB])).contentAsString).id
+			String id1 = fromJson(doPost(offersUri, toJson([userId: userA, targetSystemIds: [targetSystemId1()]])).contentAsString).id
+			String id2 = fromJson(doPost(offersUri, toJson([userId: userA, targetSystemIds: [targetSystemId1()]])).contentAsString).id
+			String id3 = fromJson(doPost(offersUri, toJson([userId: userB, targetSystemIds: [targetSystemId1()]])).contentAsString).id
 
 		and:
 			final responseA = doGet(offersUri, userId, userA)
@@ -86,7 +86,7 @@ class OffersGetRequestTest extends RequestSpecification {
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
-			final expectedMessage = 'Required path variable id or parameter userId is missing'
+			final expectedMessage = 'Required path variable id or query parameter is missing'
 
 		then:
 			resultContentIs(offersUri, responseError, BAD_REQUEST, expectedMessage)
@@ -95,7 +95,7 @@ class OffersGetRequestTest extends RequestSpecification {
 	def "A get request with a size parameter should return the right amount of Offers along with status code 200"() {
 		when:
 			for (int i = 0; i < 2; i++) {
-				doPost(offersUri, toJson([userId: userD]))
+				doPost(offersUri, toJson([userId: userD, targetSystemIds: [targetSystemId1()]]))
 			}
 
 		and:
@@ -120,7 +120,7 @@ class OffersGetRequestTest extends RequestSpecification {
 	def "A get request with a page parameter should return the right amount of Offers along with status code 200"() {
 		when:
 			for (int i = 0; i < 3; i++) {
-				doPost(offersUri, toJson([userId: userE]))
+				doPost(offersUri, toJson([userId: userE, targetSystemIds: [targetSystemId1()]]))
 			}
 
 		and:
@@ -147,9 +147,9 @@ class OffersGetRequestTest extends RequestSpecification {
 			String userF = 'f'
 
 		when:
-			doPost(offersUri, toJson([userId: userF, startTime: '11:10', startDate: '2019-08-15']))
-			doPost(offersUri, toJson([userId: userF, startTime: '11:00', startDate: '2019-08-15']))
-			doPost(offersUri, toJson([userId: userF, startTime: '11:20', startDate: '2019-08-10']))
+			doPost(offersUri, toJson([userId: userF, startTime: '11:10', startDate: '2019-08-15', targetSystemIds: [targetSystemId1()]]))
+			doPost(offersUri, toJson([userId: userF, startTime: '11:00', startDate: '2019-08-15', targetSystemIds: [targetSystemId1()]]))
+			doPost(offersUri, toJson([userId: userF, startTime: '11:20', startDate: '2019-08-10', targetSystemIds: [targetSystemId1()]]))
 
 		and:
 			final response = doGet(offersUri, userId, userF)
@@ -175,7 +175,7 @@ class OffersGetRequestTest extends RequestSpecification {
 
 		when:
 			for (int i = 0; i < defaultSize + 3; i++) {
-				doPost(offersUri, toJson([userId: userG]))
+				doPost(offersUri, toJson([userId: userG, targetSystemIds: [targetSystemId1()]]))
 			}
 
 		and:
@@ -201,7 +201,7 @@ class OffersGetRequestTest extends RequestSpecification {
 			String userH = 'h'
 
 		when:
-			doPost(offersUri, toJson([userId: userH]))
+			doPost(offersUri, toJson([userId: userH, targetSystemIds: [targetSystemId1()]]))
 
 		and:
 			final response = doGet(offersUri, userId, userH, page, 'two')
@@ -214,5 +214,33 @@ class OffersGetRequestTest extends RequestSpecification {
 
 		then:
 			contentSizeIs(responseOffers, 1)
+	}
+
+	def "A get request with an userId search parameter should work for different offers"() {
+		when:
+			def offer = (example == 1) ? defaultOffer() : exampleOffer()
+			offer = fromJson(offer)
+			offer.userId = userI
+
+			doPost(offersUri, toJson(offer))
+
+			final response = doGet(offersUri, userId, userI)
+
+		then:
+			resultIs(response, OK)
+
+		when:
+			final responseOffers = fromJson(response.contentAsString, Map)
+
+		then:
+			contentSizeIs(responseOffers, 1)
+			replaceEmptyListsByNull(
+				fromJson(
+					toJson(responseOffers.content[0]))) == offer
+
+		where:
+			example | userI
+			1       | 'i1'
+			2       | 'i2'
 	}
 }
