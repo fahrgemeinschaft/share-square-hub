@@ -177,9 +177,9 @@ class RequestSpecification extends Specification {
 	def authServerResponse(id = clientId, secret = clientSecret) {
 		(new RESTClient(tokenUri))
 				.post(body: [client_id:     id,
-					         client_secret: secret,
-					         grant_type :   'client_credentials'],
-					  requestContentType: APPLICATION_FORM_URLENCODED)
+				             client_secret: secret,
+				             grant_type :   'client_credentials'],
+				      requestContentType: APPLICATION_FORM_URLENCODED)
 	}
 
 	def accessToken() {
