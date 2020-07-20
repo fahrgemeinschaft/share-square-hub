@@ -167,11 +167,11 @@ class OfferPutRequestTest extends RequestSpecification {
 			resultContentIs(uri(), responseError, UNSUPPORTED_MEDIA_TYPE, expectedMessage)
 	}
 
-	def "A put request with umlaut should work"() {
+	def "A put request with umlaut should work and return 200"() {
 		given:
 			def updateOffer = new Offer(id: existingId(),
-				                        userId: '\u00c4', // Ae
-										targetSystemIds: [targetSystemId1()])
+			                            userId: '\u00c4', // Ae
+			                            targetSystemIds: [targetSystemId1()])
 
 		when:
 			final response = doUTF8Put(uri(), toJson(updateOffer))
@@ -192,9 +192,9 @@ class OfferPutRequestTest extends RequestSpecification {
 	def "A put request with startTime and startDate should work and have the default startTimezone in the response"() {
 		given:
 			final addOffer = [startTimezone: 'Pacific/Auckland',
-				              targetSystemIds: [targetSystemId1()]]
+			                  targetSystemIds: [targetSystemId1()]]
 			final updateOffer = [startTime: '10:40',
-				                 startDate: '2016-07-01',
+			                     startDate: '2016-07-01',
 								 targetSystemIds: [targetSystemId1()]]
 
 		when:
@@ -225,7 +225,7 @@ class OfferPutRequestTest extends RequestSpecification {
 	def "A put request with startTimezone should work"() {
 		given:
 			final offer = [startTimezone: 'America/Argentina/Buenos_Aires',
-				           targetSystemIds: [targetSystemId1()]]
+			               targetSystemIds: [targetSystemId1()]]
 
 		when:
 			final response = doPut(uri(), toJson(offer))
@@ -290,7 +290,7 @@ class OfferPutRequestTest extends RequestSpecification {
 		given:
 			final notExistingId = UUID.randomUUID()
 			final invalidOffer = new Offer(userId: '18',
-										   targetSystemIds: [targetSystemId1(), notExistingId])
+			                               targetSystemIds: [targetSystemId1(), notExistingId])
 
 		when:
 			final response = doPut(uri(), toJson(invalidOffer))
@@ -310,7 +310,7 @@ class OfferPutRequestTest extends RequestSpecification {
 		given:
 			final invalidId = 333
 			final invalidOffer = [userId: '19',
-								  targetSystemIds: [targetSystemId1(), invalidId]]
+			                      targetSystemIds: [targetSystemId1(), invalidId]]
 
 		when:
 			final response = doPut(uri(), toJson(invalidOffer))
@@ -329,8 +329,8 @@ class OfferPutRequestTest extends RequestSpecification {
 	def "A put request with an exiting target system id should work and return 200"() {
 		given: 
 			final updateOffer = new Offer(id: existingId(),
-				                          userId: '20',
-										  targetSystemIds: [null, targetSystemId1()])
+			                              userId: '20',
+			                              targetSystemIds: [null, targetSystemId1()])
 
 		when:
 			final response = doPut(uri(), toJson(updateOffer))
