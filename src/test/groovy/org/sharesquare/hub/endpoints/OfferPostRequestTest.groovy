@@ -132,7 +132,7 @@ class OfferPostRequestTest extends RequestSpecification {
 	def "A post request with umlaut should work and return 201"() {
 		given:
 			def offer = new Offer(userId: '\u00fc', // ue
-				                  targetSystemIds: [targetSystemId1()])
+			                      targetSystemIds: [targetSystemId1()])
 
 		when:
 			final response = doUTF8Post(offersUri, toJson(offer))
