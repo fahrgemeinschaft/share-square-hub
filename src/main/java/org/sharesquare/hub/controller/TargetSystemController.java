@@ -68,9 +68,8 @@ public class TargetSystemController {
 		return new ResponseEntity<>(NOT_FOUND);
 	}
 
-	@Operation(description = "Find all TargetSystems for a given userId")
+	@Operation(description = "Find all TargetSystems")
 	@ApiResponse(responseCode = "200", description = "Success")
-	@ApiResponse(responseCode = "400", description = "Request parameter userId is missing or empty", content = @Content)
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<TargetSystem>> getTargetSystems() {
 		log.info("TargetSystem GET all request");
