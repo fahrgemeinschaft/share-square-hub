@@ -162,7 +162,7 @@ class OfferPostRequestTest extends RequestSpecification {
 		given:
 			final offer = [startTime: '08:30',
 			               startDate: '2013-12-20',
-						   targetSystemIds: [targetSystemId1()]]
+			               targetSystemIds: [targetSystemId1()]]
 
 		when:
 			final response = doPost(offersUri, toJson(offer))
