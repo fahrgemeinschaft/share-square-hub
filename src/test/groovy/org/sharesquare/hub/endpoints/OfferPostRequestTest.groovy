@@ -161,7 +161,7 @@ class OfferPostRequestTest extends RequestSpecification {
 	def "A post request with startTime and startDate should work and have the default startTimezone in the response"() {
 		given:
 			final offer = [startTime: '08:30',
-				           startDate: '2013-12-20',
+			               startDate: '2013-12-20',
 						   targetSystemIds: [targetSystemId1()]]
 
 		when:
