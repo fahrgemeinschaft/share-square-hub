@@ -195,7 +195,7 @@ class OfferPostRequestTest extends RequestSpecification {
 	def "A post request with startTimezone should work and return 201"() {
 		given:
 			final offer = [startTimezone: 'Europe/Paris',
-				           targetSystemIds: [targetSystemId1()]]
+			               targetSystemIds: [targetSystemId1()]]
 
 		when:
 			final response = doPost(offersUri, toJson(offer))
@@ -267,7 +267,7 @@ class OfferPostRequestTest extends RequestSpecification {
 		given:
 			final notExistingId = UUID.randomUUID()
 			final invalidOffer = new Offer(userId: '10',
-				                           targetSystemIds: [targetSystemId1(), notExistingId])
+			                               targetSystemIds: [targetSystemId1(), notExistingId])
 
 		when:
 			final response = doPost(offersUri, toJson(invalidOffer))
@@ -287,7 +287,7 @@ class OfferPostRequestTest extends RequestSpecification {
 		given:
 			final invalidId = 333
 			final invalidOffer = [userId: '11',
-				                  targetSystemIds: [targetSystemId1(), invalidId]]
+			                      targetSystemIds: [targetSystemId1(), invalidId]]
 
 		when:
 			final response = doPost(offersUri, toJson(invalidOffer))
@@ -306,7 +306,7 @@ class OfferPostRequestTest extends RequestSpecification {
 	def "A post request with an exiting target system id should work and return 201"() {
 		given:
 			final offer = new Offer(userId: '12',
-				                    targetSystemIds: [null, targetSystemId1()])
+			                        targetSystemIds: [null, targetSystemId1()])
 
 		when:
 			final response = doPost(offersUri, toJson(offer))
