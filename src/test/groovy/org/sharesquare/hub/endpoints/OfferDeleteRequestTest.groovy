@@ -1,6 +1,5 @@
 package org.sharesquare.hub.endpoints
 
-import static org.sharesquare.hub.endpoints.OfferUtil.defaultOffer
 import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -13,7 +12,8 @@ class OfferDeleteRequestTest extends RequestSpecification {
 
 	def "A delete request with an existing id should work and respond with status code 204"() {
 		when:
-			final id = fromJson(doPost(offersUri, defaultOffer).contentAsString).id
+			final offer = (example == 1) ? defaultOffer() : exampleOffer()
+			final id = fromJson(doPost(offersUri, offer).contentAsString).id
 			final response = doDelete("$offersUri/$id")
 
 		then:
@@ -24,6 +24,11 @@ class OfferDeleteRequestTest extends RequestSpecification {
 
 		then:
 			getResponse.status == NOT_FOUND.value
+			
+		where:
+			example | _
+			1       | _
+			2       | _
 	}
 
 	def "A delete request with a not existing id should respond with status code 404"() {
@@ -65,6 +70,6 @@ class OfferDeleteRequestTest extends RequestSpecification {
 		where:
 			id       | expectedMessage
 			'invalid' | "Type mismatch for path variable: Invalid UUID string: $id"
-			''        | 'Required path variable Offer id is missing'
+			''        | 'Required path variable id is missing'
 	}
 }

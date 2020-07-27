@@ -1,14 +1,18 @@
 package org.sharesquare.hub.configuration;
 
 import lombok.Data;
-import org.sharesquare.commons.sanity.OfferSanitizer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sharesquare.hub.model.data.EntityTargetSystem;
+import org.sharesquare.hub.repository.TargetSystemRepository;
 import org.sharesquare.model.Connector;
-import org.sharesquare.model.Offer;
 import org.sharesquare.model.connector.ConnectorState;
 import org.sharesquare.repository.IRepository;
 import org.sharesquare.repository.SimpleInMemoryRepository;
-import org.sharesquare.sanity.IShareSquareSanitizer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +31,6 @@ public class SystemConfiguration {
 
     @Bean
     IRepository<Connector> createConnectorRepo(){
-    	if (useExamples) {
-    		return ExampleData.connectorRepo();
-    	}
         return new SimpleInMemoryRepository<Connector>();
     }
 
@@ -38,8 +39,10 @@ public class SystemConfiguration {
         return new SimpleInMemoryRepository<ConnectorState>();
     }
 
-    @Bean
-    IShareSquareSanitizer<Offer> createOfferSanitizer(){
-        return new OfferSanitizer();
-    }
+	@Bean
+	public ApplicationRunner initializer(TargetSystemRepository repository) {
+		final List<EntityTargetSystem> exampleTargetSystems = useExamples ?
+				ExampleData.getEntityTargetSystems() : new ArrayList<>();
+		return args -> repository.saveAll(exampleTargetSystems);
+	}
 }

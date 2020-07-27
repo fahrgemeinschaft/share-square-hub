@@ -1,6 +1,5 @@
 package org.sharesquare.hub.endpoints
 
-import static org.sharesquare.hub.endpoints.OfferUtil.defaultOffer
 import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -13,18 +12,27 @@ class OfferGetRequestTest extends RequestSpecification {
 
 	def "A get request with an existing id should return the corresponding Offer along with status code 200"() {
 		when:
-			final id = fromJson(doPost(offersUri, defaultOffer).contentAsString).id
+			def offer = (example == 1) ? defaultOffer() : exampleOffer()
+			final id = fromJson(doPost(offersUri, offer).contentAsString).id
 			final response = doGet("$offersUri/$id")
 
 		then:
 			resultIs(response, OK)
 
 		when:
-			final responseOffer = fromJson(response.contentAsString)
+			def responseOffer = fromJson(response.contentAsString)
+			responseOffer = replaceEmptyListsByNull(responseOffer)
+			offer = fromJson(offer)
 
 		then:
 			responseOffer.id instanceof UUID
 			responseOffer.id != null
+			responseOffer == offer
+			
+		where:
+			example | _
+			1       | _
+			2       | _
 	}
 
 	def "A get request with a not existing id should respond with status code 404"() {
@@ -54,6 +62,6 @@ class OfferGetRequestTest extends RequestSpecification {
 		where:
 			id        | expectedMessage
 			'invalid' | "Type mismatch for path variable: Invalid UUID string: $id"
-			''        | 'Required path variable id or parameter userId is missing'
+			''        | 'Required path variable id or query parameter is missing'
 	}
 }

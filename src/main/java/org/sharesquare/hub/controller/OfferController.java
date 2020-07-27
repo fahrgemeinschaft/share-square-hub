@@ -1,4 +1,4 @@
-package org.sharesquare.hub.endpoints;
+package org.sharesquare.hub.controller;
 
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
 import static org.sharesquare.hub.exception.ErrorMessage.USER_ID_IS_EMPTY;
@@ -40,9 +40,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @ApiResponse(responseCode = "403", description = "Client not allowed", content = @Content)
 @RestController
 @RequestMapping("/offers")
-public class Offers {
+public class OfferController {
 
-    private static final Logger log = LoggerFactory.getLogger(Offers.class);
+    private static final Logger log = LoggerFactory.getLogger(OfferController.class);
 
     @Autowired
     OfferService offerService;

@@ -2,21 +2,20 @@ package org.sharesquare.hub.model.data;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.UUID;
 
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.LazyCollection;
@@ -42,7 +41,7 @@ public class EntityOffer extends BaseEntity {
 	private LocalTime startTime;
 
 	@Column(name = "start_timezone")
-	private ZoneId startTimezone;
+	private String startTimezone;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "origin")
@@ -58,12 +57,14 @@ public class EntityOffer extends BaseEntity {
 	           inverseJoinColumns = @JoinColumn(name = "contact_option_id"))
 	private List<EntityContactOption> contactOptions;
 
-	@ElementCollection
-	@CollectionTable(name = "offer_target_system_membership",
-	                 joinColumns = @JoinColumn(name = "offer_id"))
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@Column(name = "target_system_id")
-	private List<UUID> targetPlatforms;
+	@ManyToMany(cascade = CascadeType.DETACH)
+	@JoinTable(name = "offer_target_system_membership",
+	           joinColumns = @JoinColumn(name = "offer_id"),
+	           inverseJoinColumns = @JoinColumn(name = "target_system_id"))
+	@NotEmpty(message = "The list of target system ids must not be empty")
+	@Embedded
+	private List<EntityTargetSystem> targetSystems;
 
 	@ManyToAny(metaDef = "PreferenceMetaDef",
 			   metaColumn = @Column(name = "preference_type"),

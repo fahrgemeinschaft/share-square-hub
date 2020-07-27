@@ -1,6 +1,8 @@
 package org.sharesquare.hub.endpoints
 
-import static org.sharesquare.hub.endpoints.OfferUtil.defaultOffer
+import static org.sharesquare.hub.endpoints.OfferUtil.targetSystemIds
+import static org.sharesquare.hub.endpoints.OfferUtil.userId
+import static org.sharesquare.hub.endpoints.OfferUtil.userIdExample
 import static org.springframework.http.HttpHeaders.AUTHORIZATION
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
@@ -14,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 
 import org.sharesquare.model.Offer
+import org.sharesquare.model.TargetSystem
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -36,26 +39,147 @@ class RequestSpecification extends Specification {
 	ObjectMapper objectMapper
 
 	@Value("\${custom.auth.server.token.uri}")
-	private String tokenUri;
+	private tokenUri;
 
 	@Value("\${custom.auth.server.client.id}")
-	private String clientId;
+	private clientId;
 
 	@Value("\${custom.auth.server.client.secret}")
-	private String clientSecret;
+	private clientSecret;
 
 	@Value("\${custom.auth.server.client.not.in.scope.id}")
-	private String clientNotInScopeId;
+	private clientNotInScopeId;
 
 	@Value("\${custom.auth.server.client.not.in.scope.secret}")
-	private String clientNotInScopeSecret;
+	private clientNotInScopeSecret;
+
+	static final targetSystemsUri = '/targetsystems'
+
+	private targetSystems
+
+	def targetSystems() {
+		targetSystems = (targetSystems != null) ? targetSystems : fromJson(doGet(targetSystemsUri).contentAsString, TargetSystem[])
+	}
+
+	private targetSystemId0
+
+	def targetSystemId0() {
+		targetSystemId0 = (targetSystemId0 != null) ? targetSystemId0 : targetSystems()[0].id
+	}
+
+	private targetSystemId1
+
+	def targetSystemId1() {
+		targetSystemId1 = (targetSystemId1 != null) ? targetSystemId1 : targetSystems()[1].id
+	}
+
+	private targetSystemId2
+
+	def targetSystemId2() {
+		targetSystemId2 = (targetSystemId2 != null) ? targetSystemId2 : targetSystems()[2].id
+	}
+
+	private defaultOffer
+
+	def defaultOffer() {
+		defaultOffer = (defaultOffer != null) ? defaultOffer : "{\"$targetSystemIds\": [\"${targetSystemId0()}\"]}"
+	}
+
+	private exampleOffer
+
+	def exampleOffer() {
+		exampleOffer = (exampleOffer != null) ? exampleOffer : """
+		{
+		  \"$userId\": \"$userIdExample\",
+		  \"startDate\": \"2020-06-26\",
+		  \"startTime\": \"23:57\",
+		  \"startTimezone\": \"Europe/Paris\",
+		  \"origin\": {
+		    \"latitude\": 0,
+		    \"longitude\": 0,
+		    \"name\": \"string\",
+		    \"type\": \"Address\"
+		  },
+		  \"destination\": {
+		    \"latitude\": 0,
+		    \"longitude\": 0,
+		    \"name\": \"string\",
+		    \"type\": \"Address\"
+		  },
+		  \"contactOptions\": [
+		    {
+		      \"contactType\": \"EMAIL\",
+		      \"contactIdentifier\": \"string\"
+		    }
+		  ],
+		  \"$targetSystemIds\": [
+		    \"${targetSystemId1()}\",
+		    \"${targetSystemId2()}\"
+		  ],
+		  \"preferences\": [
+ 		   {
+		      \"key\": \"string\",
+		      \"value\": true,
+		      \"type\": \"BooleanPreference\"
+		    },
+ 		   {
+ 		     \"key\": \"string\",
+		      \"value\": 0,
+		      \"type\": \"DoublePreference\"
+		    },
+		    {
+		      \"key\": \"string\",
+		      \"value\": 0,
+		      \"type\": \"IntegerPreference\"
+		    },
+		    {
+		      \"key\": \"string\",
+		      \"value\": \"MALE\",
+		      \"type\": \"PaxGenderPreference\"
+		    },
+		    {
+		      \"key\": \"string\",
+		      \"value\": \"PETS_OK\",
+		      \"type\": \"PaxPetsPreference\"
+		    },
+		    {
+		      \"key\": \"string\",
+		      \"value\": \"SMOKER\",
+		      \"type\": \"PaxSmokerPreference\"
+		    },
+		    {
+		      \"key\": \"string\",
+		      \"value\": \"string\",
+		      \"type\": \"StringPreference\"
+		    }
+		  ],
+		  "additionalInfo": "string"
+		}
+		"""
+	}
+
+	protected static final defaultTargetSystem = '{}'
+
+	protected static final exampleTargetSystem = '''
+		{
+		  "name": "Pendlernetz",
+		  "description": "string",
+		  "vanityUrl": "http://pendlernetz.de",
+		  "contentLanguage": "string",
+		  "dataProtectionRegulations": "string",
+		  "connector": {
+		    "offerUpdateWebhook": "http://pendlernetz.de/api/offers",
+		    "aliveCheckWebhook": "http://pendlernetz.de/api/alivecheck"
+		  }
+		}
+		'''
 
 	def authServerResponse(id = clientId, secret = clientSecret) {
 		(new RESTClient(tokenUri))
 				.post(body: [client_id:     id,
-					         client_secret: secret,
-					         grant_type :   'client_credentials'],
-					  requestContentType: APPLICATION_FORM_URLENCODED)
+				             client_secret: secret,
+				             grant_type :   'client_credentials'],
+				      requestContentType: APPLICATION_FORM_URLENCODED)
 	}
 
 	def accessToken() {
@@ -96,7 +220,7 @@ class RequestSpecification extends Specification {
 				post(uri)
 					.header(AUTHORIZATION, value)
 					.contentType(APPLICATION_JSON)
-					.content(defaultOffer)
+					.content(defaultOffer())
 			)
 			.andDo(print())
 			.andReturn()
@@ -108,7 +232,7 @@ class RequestSpecification extends Specification {
 				post(uri)
 					.header(key, "Bearer ${accessToken()}")
 					.contentType(APPLICATION_JSON)
-					.content(defaultOffer)
+					.content(defaultOffer())
 			)
 			.andDo(print())
 			.andReturn()
@@ -119,7 +243,7 @@ class RequestSpecification extends Specification {
 		mvc.perform(
 				post(uri)
 					.contentType(APPLICATION_JSON)
-					.content(defaultOffer)
+					.content(defaultOffer())
 			)
 			.andDo(print())
 			.andReturn()
@@ -207,8 +331,8 @@ class RequestSpecification extends Specification {
 		if (offer.contactOptions == []) {
 			offer.contactOptions = null
 		}
-		if (offer.targetPlatforms == []) {
-			offer.targetPlatforms = null
+		if (offer.targetSystemIds == []) {
+			offer.targetSystemIds = null
 		}
 		if (offer.preferences == []) {
 			offer.preferences = null

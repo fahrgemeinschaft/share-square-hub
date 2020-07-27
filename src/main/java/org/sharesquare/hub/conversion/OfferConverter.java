@@ -1,13 +1,18 @@
 package org.sharesquare.hub.conversion;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.sharesquare.hub.model.data.EntityContactOption;
 import org.sharesquare.hub.model.data.EntityLocation;
 import org.sharesquare.hub.model.data.EntityOffer;
 import org.sharesquare.hub.model.data.EntityPreference;
+import org.sharesquare.hub.model.data.EntityTargetSystem;
 import org.sharesquare.hub.model.data.preferences.EntityBooleanPreference;
 import org.sharesquare.hub.model.data.preferences.EntityDoublePreference;
 import org.sharesquare.hub.model.data.preferences.EntityIntegerPreference;
@@ -48,7 +53,7 @@ public class OfferConverter {
 		entityOffer.setUserId(offer.getUserId());
 		entityOffer.setStartDate(offer.getStartDate());
 		entityOffer.setStartTime(offer.getStartTime());
-		entityOffer.setStartTimezone(offer.getStartTimezone());
+		entityOffer.setStartTimezone(offer.getStartTimezone().getId());
 		entityOffer.setOrigin(
 				apiToEntity(offer.getOrigin()));
 		entityOffer.setDestination(
@@ -63,14 +68,18 @@ public class OfferConverter {
 			}
 			entityOffer.setContactOptions(entityContactOptions);
 		}
-		if (offer.getTargetPlatforms() != null) {
-			List<UUID> entityTargetPlatformIds = new ArrayList<>();
-			for (UUID targetPlatformId : offer.getTargetPlatforms()) {
-				if (targetPlatformId != null) {
-					entityTargetPlatformIds.add(targetPlatformId);
+		if (offer.getTargetSystemIds() != null) {
+			removeDuplicates(offer.getTargetSystemIds());
+			List<EntityTargetSystem> entityTargetSystems = new ArrayList<>();
+			EntityTargetSystem entityTargetSystem;
+			for (UUID targetSystemId : offer.getTargetSystemIds()) {
+				if (targetSystemId != null) {
+					entityTargetSystem = new EntityTargetSystem();
+					entityTargetSystem.setId(targetSystemId);
+					entityTargetSystems.add(entityTargetSystem);
 				}
 			}
-			entityOffer.setTargetPlatforms(entityTargetPlatformIds);
+			entityOffer.setTargetSystems(entityTargetSystems);
 		}
 		if (offer.getPreferences() != null) {
 			List<EntityPreference<?>> entityPreferences = new ArrayList<>();
@@ -115,6 +124,13 @@ public class OfferConverter {
 		return entityOffer;
 	}
 
+	private <T> List<T> removeDuplicates(List<T> list) {
+		List<T> noDupList = list.stream()
+				.distinct()
+				.collect(Collectors.toList());
+		return noDupList;
+	}
+
 	private EntityLocation apiToEntity(final Location location) {
 		if (location != null) {
 			EntityLocation entityLocation = new EntityLocation();
@@ -142,7 +158,7 @@ public class OfferConverter {
 		offer.setUserId(entityOffer.getUserId());
 		offer.setStartDate(entityOffer.getStartDate());
 		offer.setStartTime(entityOffer.getStartTime());
-		offer.setStartTimezone(entityOffer.getStartTimezone());
+		offer.setStartTimezone(ZoneId.of(entityOffer.getStartTimezone()));
 		offer.setOrigin(
 				entityToApi(entityOffer.getOrigin()));
 		offer.setDestination(
@@ -156,8 +172,12 @@ public class OfferConverter {
 			}
 			offer.setContactOptions(contactOptions);
 		}
-		if (entityOffer.getTargetPlatforms() != null) {
-			offer.setTargetPlatforms(entityOffer.getTargetPlatforms());
+		if (entityOffer.getTargetSystems() != null) {
+			List<UUID> targetSystemIds = new ArrayList<>();
+			for (EntityTargetSystem entityTargetSystem: entityOffer.getTargetSystems()) {
+				targetSystemIds.add(entityTargetSystem.getId());
+			}
+			offer.setTargetSystemIds(targetSystemIds);
 		}
 		if (entityOffer.getPreferences() != null) {
 			List<Preference> preferences = new ArrayList<>();
