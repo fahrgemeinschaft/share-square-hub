@@ -2,6 +2,7 @@ package org.sharesquare.hub.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.sharesquare.hub.conversion.TargetSystemConverter;
@@ -20,6 +21,9 @@ public class TargetSystemService {
 	@Autowired
 	private TargetSystemConverter targetSystemConverter;
 
+	@Autowired
+	private OfferTargetStatusService offerTargetStatusService;
+
 	public TargetSystem addTargetSystem(final TargetSystem targetSystem) {
 		EntityTargetSystem entityTargetSystem = targetSystemConverter.apiToEntity(targetSystem);
 		removeIds(entityTargetSystem);
@@ -35,7 +39,9 @@ public class TargetSystemService {
 	}
 
 	public boolean deleteTargetSystem(final UUID id) {
-		if (targetSystemRepository.existsById(id)) {
+		Optional<EntityTargetSystem> entityTargetSystem = targetSystemRepository.findById(id);
+		if (entityTargetSystem.isPresent()) {
+			offerTargetStatusService.remove(entityTargetSystem.get());
 			targetSystemRepository.deleteById(id);
 			return true;
 		}
@@ -43,9 +49,14 @@ public class TargetSystemService {
 	}
 
 	public List<TargetSystem> getTargetSystems() {
+		List<EntityTargetSystem> entityTargetSystems = getEntityTargetSystems();
+		return targetSystemConverter.entityToApi(entityTargetSystems);
+	}
+
+	protected List<EntityTargetSystem> getEntityTargetSystems() {
 		Iterable<EntityTargetSystem> entityTargetSystems = targetSystemRepository.findAll();
 		List<EntityTargetSystem> entityTargetSystemList = new ArrayList<>();
 		entityTargetSystems.forEach(entityTargetSystemList::add);
-		return targetSystemConverter.entityToApi(entityTargetSystemList);
+		return entityTargetSystemList;
 	}
 }
