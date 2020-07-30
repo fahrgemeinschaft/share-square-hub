@@ -62,7 +62,7 @@ public class EntityOffer extends BaseEntity {
 	@JoinTable(name = "offer_target_system_membership",
 	           joinColumns = @JoinColumn(name = "offer_id"),
 	           inverseJoinColumns = @JoinColumn(name = "target_system_id"))
-	@NotEmpty(message = "The list of target system ids must not be empty")
+	@NotEmpty(message = "The list of targetSystem ids must not be empty")
 	@Embedded
 	private List<EntityTargetSystem> targetSystems;
 
@@ -77,4 +77,7 @@ public class EntityOffer extends BaseEntity {
 
 	@Column(name = "additional_info")
 	private String additionalInfo;
+
+	@Column(name = "client_id")
+	private String clientId;
 }

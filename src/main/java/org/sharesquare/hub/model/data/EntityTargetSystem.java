@@ -37,4 +37,6 @@ public class EntityTargetSystem extends BaseEntity {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "connector")
 	private EntityConnector connector;
+
+	private boolean active;
 }
