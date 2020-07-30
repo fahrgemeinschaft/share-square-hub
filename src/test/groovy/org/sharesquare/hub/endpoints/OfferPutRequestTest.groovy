@@ -171,8 +171,8 @@ class OfferPutRequestTest extends RequestSpecification {
 			                            userId: '\u00c4', // Ae
 			                            startDate: LocalDate.now(),
 			                            startTime: LocalTime.of(9, 41, 0, 0),
-										origin: [latitude: 0, longitude: 0],
-										destination: [latitude: 0, longitude: 0],
+			                            origin: [latitude: 0, longitude: 0],
+			                            destination: [latitude: 0, longitude: 0],
 			                            targetSystemIds: [targetSystemId1()])
 
 		when:
@@ -196,14 +196,14 @@ class OfferPutRequestTest extends RequestSpecification {
 			final addOffer = [startTimezone: 'Pacific/Auckland',
 			                  startTime: '11:43',
 			                  startDate: '2016-03-21',
-							  origin: [latitude: 0, longitude: 0],
-							  destination: [latitude: 0, longitude: 0],
+			                  origin: [latitude: 0, longitude: 0],
+			                  destination: [latitude: 0, longitude: 0],
 			                  targetSystemIds: [targetSystemId1()]]
 			final updateOffer = [startTime: '10:40',
 			                     startDate: '2016-07-01',
-								 origin: [latitude: 0, longitude: 0],
-								 destination: [latitude: 0, longitude: 0],
-								 targetSystemIds: [targetSystemId1()]]
+			                     origin: [latitude: 0, longitude: 0],
+			                     destination: [latitude: 0, longitude: 0],
+			                     targetSystemIds: [targetSystemId1()]]
 
 		when:
 			final id = fromJson(doPost(offersUri, toJson(addOffer)).contentAsString).id
@@ -235,8 +235,8 @@ class OfferPutRequestTest extends RequestSpecification {
 			final offer = [startTimezone: 'America/Argentina/Buenos_Aires',
 			               startTime: '11:23',
 			               startDate: '2014-03-26',
-						   origin: [latitude: 0, longitude: 0],
-						   destination: [latitude: 0, longitude: 0],
+			               origin: [latitude: 0, longitude: 0],
+			               destination: [latitude: 0, longitude: 0],
 			               targetSystemIds: [targetSystemId1()]]
 
 		when:
@@ -310,7 +310,7 @@ class OfferPutRequestTest extends RequestSpecification {
 			resultContentIs(uri(), responseError, BAD_REQUEST, expectedMessage)
 
 		where:
-			invalidOffer                                                                               | _
+			invalidOffer                                                                                                                                                              | _
 			[userId: '13', startDate: '2008-10-03', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0]]                                | _
 			[userId: '14', startDate: '2008-10-03', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: null]         | _
 			[userId: '15', startDate: '2008-10-03', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: []]           | _
@@ -324,8 +324,8 @@ class OfferPutRequestTest extends RequestSpecification {
 			final invalidOffer = new Offer(userId: '18',
 			                               startDate: LocalDate.now(),
 			                               startTime: LocalTime.now(),
-										   origin: [latitude: 0, longitude: 0],
-										   destination: [latitude: 0, longitude: 0],
+			                               origin: [latitude: 0, longitude: 0],
+			                               destination: [latitude: 0, longitude: 0],
 			                               targetSystemIds: [targetSystemId1(), notExistingId])
 
 		when:
@@ -366,10 +366,10 @@ class OfferPutRequestTest extends RequestSpecification {
 		given: 
 			final updateOffer = new Offer(id: existingId(),
 			                              userId: '20',
-										  startDate: LocalDate.now(),
-										  startTime: LocalTime.of(5, 25, 0, 0),
-										  origin: [latitude: 0, longitude: 0],
-										  destination: [latitude: 0, longitude: 0],
+			                              startDate: LocalDate.now(),
+			                              startTime: LocalTime.of(5, 25, 0, 0),
+			                              origin: [latitude: 0, longitude: 0],
+			                              destination: [latitude: 0, longitude: 0],
 			                              targetSystemIds: [null, targetSystemId1()])
 
 		when:

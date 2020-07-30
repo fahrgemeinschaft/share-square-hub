@@ -283,7 +283,7 @@ class OfferPostRequestTest extends RequestSpecification {
 			resultContentIs(offersUri, responseError, BAD_REQUEST, expectedMessage)
 
 		where:
-			invalidOffer                                                                              | _
+			invalidOffer                                                                                                                                                             | _
 			[userId: '5', startDate: '2009-11-05', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0]]                                | _
 			[userId: '6', startDate: '2009-11-05', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: null]         | _
 			[userId: '7', startDate: '2009-11-05', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: []]           | _
