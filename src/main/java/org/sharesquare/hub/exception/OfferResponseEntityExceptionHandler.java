@@ -93,7 +93,7 @@ public class OfferResponseEntityExceptionHandler {
 			List<FieldError> errors = result.getFieldErrors();
 			if (!CollectionUtils.isEmpty(errors)) {
 				FieldError e = errors.get(0);
-				message = String.format("%s Value '%s' not excepted.", e.getDefaultMessage(), e.getRejectedValue());
+				message = String.format("%s. Value '%s' for %s not excepted.", e.getDefaultMessage(), e.getRejectedValue(), e.getField());
 			}
 		}
 		log.info("Wrong client request (method argument not valid): " + message);
