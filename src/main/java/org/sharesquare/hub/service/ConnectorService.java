@@ -44,18 +44,18 @@ public class ConnectorService {
 
     @Autowired
     IRepository<ConnectorState> connectorStateRepo;
-    
-    @Autowired
-    private TargetSystemTripConverter targetSystemTripConverter;
-    
-    @Autowired
-    private TargetSystemService targetSystemService;
-    
-    @Autowired
-    private OfferTargetStatusService offerTargetStatusService;
-    
-    @Value("${custom.data.example.target.connector.client.name}")
-    private String exampleTargetConnectorClientName;
+
+	@Autowired
+	private TargetSystemTripConverter targetSystemTripConverter;
+
+	@Autowired
+	private TargetSystemService targetSystemService;
+
+	@Autowired
+	private OfferTargetStatusService offerTargetStatusService;
+
+	@Value("${custom.data.example.target.connector.client.name}")
+	private String exampleTargetConnectorClientName;
 
   //  @Autowired
    // WebClient oauthWebClient;
