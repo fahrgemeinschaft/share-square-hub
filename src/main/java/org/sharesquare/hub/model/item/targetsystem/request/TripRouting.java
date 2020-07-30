@@ -8,14 +8,14 @@ import lombok.Data;
 public class TripRouting {
 
 	@JsonProperty("RoutingID")
-    private String id;
+	private String id;
 
 	@JsonProperty("Origin")
-    private Place origin;
+	private Place origin;
 
 	@JsonProperty("Destination")
-    private Place destination;
+	private Place destination;
 
 	@JsonProperty("RoutingIndex")
-    private int routingIndex;
+	private int routingIndex;
 }
