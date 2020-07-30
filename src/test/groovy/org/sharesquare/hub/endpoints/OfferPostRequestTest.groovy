@@ -132,8 +132,8 @@ class OfferPostRequestTest extends RequestSpecification {
 			def offer = new Offer(userId: '\u00fc', // ue
 			                      startDate: LocalDate.now(),
 			                      startTime: LocalTime.of(7, 21, 0, 0),
-								  origin: [latitude: 0, longitude: 0],
-								  destination: [latitude: 0, longitude: 0],
+			                      origin: [latitude: 0, longitude: 0],
+			                      destination: [latitude: 0, longitude: 0],
 			                      targetSystemIds: [targetSystemId1()])
 
 		when:
@@ -164,8 +164,8 @@ class OfferPostRequestTest extends RequestSpecification {
 		given:
 			final offer = [startTime: '08:30',
 			               startDate: '2013-12-20',
-						   origin: [latitude: 0, longitude: 0],
-						   destination: [latitude: 0, longitude: 0],
+			               origin: [latitude: 0, longitude: 0],
+			               destination: [latitude: 0, longitude: 0],
 			               targetSystemIds: [targetSystemId1()]]
 
 		when:
@@ -201,8 +201,8 @@ class OfferPostRequestTest extends RequestSpecification {
 			final offer = [startTimezone: 'Europe/Paris',
 			               startDate: '2007-05-21',
 			               startTime: '07:16',
-						   origin: [latitude: 0, longitude: 0],
-						   destination: [latitude: 0, longitude: 0],
+			               origin: [latitude: 0, longitude: 0],
+			               destination: [latitude: 0, longitude: 0],
 			               targetSystemIds: [targetSystemId1()]]
 
 		when:
@@ -297,8 +297,8 @@ class OfferPostRequestTest extends RequestSpecification {
 			final invalidOffer = new Offer(userId: '10',
 			                               startDate: LocalDate.now(),
 			                               startTime: LocalTime.now(),
-										   origin: [latitude: 0, longitude: 0],
-										   destination: [latitude: 0, longitude: 0],
+			                               origin: [latitude: 0, longitude: 0],
+			                               destination: [latitude: 0, longitude: 0],
 			                               targetSystemIds: [targetSystemId1(), notExistingId])
 
 		when:
@@ -340,8 +340,8 @@ class OfferPostRequestTest extends RequestSpecification {
 			final offer = new Offer(userId: '12',
 			                        startDate: LocalDate.now(), 
 			                        startTime: LocalTime.of(7, 20, 0, 0),
-									origin: [latitude: 0, longitude: 0],
-									destination: [latitude: 0, longitude: 0],
+			                        origin: [latitude: 0, longitude: 0],
+			                        destination: [latitude: 0, longitude: 0],
 			                        targetSystemIds: [null, targetSystemId1()])
 
 		when:
