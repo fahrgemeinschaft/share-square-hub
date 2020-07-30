@@ -19,9 +19,9 @@ class OffersGetRequestTest extends RequestSpecification {
 			String userC = 'c'
 
 		when:
-			String id1 = fromJson(doPost(offersUri, toJson([userId: userA, targetSystemIds: [targetSystemId1()]])).contentAsString).id
-			String id2 = fromJson(doPost(offersUri, toJson([userId: userA, targetSystemIds: [targetSystemId1()]])).contentAsString).id
-			String id3 = fromJson(doPost(offersUri, toJson([userId: userB, targetSystemIds: [targetSystemId1()]])).contentAsString).id
+			String id1 = fromJson(doPost(offersUri, toJson([userId: userA, startTime: '21:22', startDate: '2013-02-25', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]])).contentAsString).id
+			String id2 = fromJson(doPost(offersUri, toJson([userId: userA, startTime: '21:22', startDate: '2013-02-25', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]])).contentAsString).id
+			String id3 = fromJson(doPost(offersUri, toJson([userId: userB, startTime: '21:22', startDate: '2013-02-25', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]])).contentAsString).id
 
 		and:
 			final responseA = doGet(offersUri, userId, userA)
@@ -95,7 +95,7 @@ class OffersGetRequestTest extends RequestSpecification {
 	def "A get request with a size parameter should return the right amount of Offers along with status code 200"() {
 		when:
 			for (int i = 0; i < 2; i++) {
-				doPost(offersUri, toJson([userId: userD, targetSystemIds: [targetSystemId1()]]))
+				doPost(offersUri, toJson([userId: userD, startTime: '11:10', startDate: '2009-04-16', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]]))
 			}
 
 		and:
@@ -120,7 +120,7 @@ class OffersGetRequestTest extends RequestSpecification {
 	def "A get request with a page parameter should return the right amount of Offers along with status code 200"() {
 		when:
 			for (int i = 0; i < 3; i++) {
-				doPost(offersUri, toJson([userId: userE, targetSystemIds: [targetSystemId1()]]))
+				doPost(offersUri, toJson([userId: userE, startTime: '13:10', startDate: '2019-08-10', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]]))
 			}
 
 		and:
@@ -147,9 +147,9 @@ class OffersGetRequestTest extends RequestSpecification {
 			String userF = 'f'
 
 		when:
-			doPost(offersUri, toJson([userId: userF, startTime: '11:10', startDate: '2019-08-15', targetSystemIds: [targetSystemId1()]]))
-			doPost(offersUri, toJson([userId: userF, startTime: '11:00', startDate: '2019-08-15', targetSystemIds: [targetSystemId1()]]))
-			doPost(offersUri, toJson([userId: userF, startTime: '11:20', startDate: '2019-08-10', targetSystemIds: [targetSystemId1()]]))
+			doPost(offersUri, toJson([userId: userF, startTime: '11:10', startDate: '2019-08-15', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]]))
+			doPost(offersUri, toJson([userId: userF, startTime: '11:00', startDate: '2019-08-15', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]]))
+			doPost(offersUri, toJson([userId: userF, startTime: '11:20', startDate: '2019-08-10', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]]))
 
 		and:
 			final response = doGet(offersUri, userId, userF)
@@ -175,7 +175,7 @@ class OffersGetRequestTest extends RequestSpecification {
 
 		when:
 			for (int i = 0; i < defaultSize + 3; i++) {
-				doPost(offersUri, toJson([userId: userG, targetSystemIds: [targetSystemId1()]]))
+				doPost(offersUri, toJson([userId: userG, startTime: '11:11', startDate: '2011-06-04', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]]))
 			}
 
 		and:
@@ -201,7 +201,7 @@ class OffersGetRequestTest extends RequestSpecification {
 			String userH = 'h'
 
 		when:
-			doPost(offersUri, toJson([userId: userH, targetSystemIds: [targetSystemId1()]]))
+			doPost(offersUri, toJson([userId: userH, startTime: '17:01', startDate: '2012-11-24', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [targetSystemId1()]]))
 
 		and:
 			final response = doGet(offersUri, userId, userH, page, 'two')

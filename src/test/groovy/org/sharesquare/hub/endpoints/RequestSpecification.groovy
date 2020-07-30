@@ -81,8 +81,23 @@ class RequestSpecification extends Specification {
 
 	private defaultOffer
 
+	// berlin -> hamburg
 	def defaultOffer() {
-		defaultOffer = (defaultOffer != null) ? defaultOffer : "{\"$targetSystemIds\": [\"${targetSystemId0()}\"]}"
+		defaultOffer = (defaultOffer != null) ? defaultOffer : """
+		{
+		  \"startDate\": \"2019-05-05\",
+		  \"startTime\": \"23:32\",
+		  \"origin\": {
+		    \"latitude\": 52.531677,
+		    \"longitude\": 13.381777
+		  },
+		  \"destination\": {
+		    \"latitude\": 53.551086,
+		    \"longitude\": 9.993682
+		  },
+		  \"$targetSystemIds\": [\"${targetSystemId0()}\"]
+		}
+		"""
 	}
 
 	private exampleOffer

@@ -9,6 +9,9 @@ import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE
 import static org.springframework.http.MediaType.TEXT_XML
 
+import java.time.LocalDate
+import java.time.LocalTime
+
 import org.sharesquare.model.Offer
 
 import spock.lang.Issue
@@ -32,12 +35,7 @@ class OfferPutRequestTest extends RequestSpecification {
 
 	def "A valid put request should work and return 200"() {
 		when:
-			def requestOffer = null
-			if (example == 1) {
-				requestOffer = "{\"$userId\": \"3\", \"$targetSystemIds\": [\"${targetSystemId1()}\"]}"
-			} else {
-				requestOffer = exampleOffer()
-			}
+			def requestOffer = (example == 1) ? defaultOffer() : exampleOffer()
 			final response = doPut(uri(), requestOffer)
 
 		then:
@@ -171,6 +169,10 @@ class OfferPutRequestTest extends RequestSpecification {
 		given:
 			def updateOffer = new Offer(id: existingId(),
 			                            userId: '\u00c4', // Ae
+			                            startDate: LocalDate.now(),
+			                            startTime: LocalTime.of(9, 41, 0, 0),
+										origin: [latitude: 0, longitude: 0],
+										destination: [latitude: 0, longitude: 0],
 			                            targetSystemIds: [targetSystemId1()])
 
 		when:
@@ -192,9 +194,15 @@ class OfferPutRequestTest extends RequestSpecification {
 	def "A put request with startTime and startDate should work and have the default startTimezone in the response"() {
 		given:
 			final addOffer = [startTimezone: 'Pacific/Auckland',
+			                  startTime: '11:43',
+			                  startDate: '2016-03-21',
+							  origin: [latitude: 0, longitude: 0],
+							  destination: [latitude: 0, longitude: 0],
 			                  targetSystemIds: [targetSystemId1()]]
 			final updateOffer = [startTime: '10:40',
 			                     startDate: '2016-07-01',
+								 origin: [latitude: 0, longitude: 0],
+								 destination: [latitude: 0, longitude: 0],
 								 targetSystemIds: [targetSystemId1()]]
 
 		when:
@@ -225,6 +233,10 @@ class OfferPutRequestTest extends RequestSpecification {
 	def "A put request with startTimezone should work"() {
 		given:
 			final offer = [startTimezone: 'America/Argentina/Buenos_Aires',
+			               startTime: '11:23',
+			               startDate: '2014-03-26',
+						   origin: [latitude: 0, longitude: 0],
+						   destination: [latitude: 0, longitude: 0],
 			               targetSystemIds: [targetSystemId1()]]
 
 		when:
@@ -263,6 +275,26 @@ class OfferPutRequestTest extends RequestSpecification {
 			[startTimezone: 'Europe/Rostock'] | _
 	}
 
+	@Issue("#30")
+	def "A put request with a missing startTime or startDate should respond with status code 400 and a meaningful error message"() {
+		when:
+			final response = doPut(uri(), toJson(invalidOffer))
+
+		then:
+			resultIs(response, BAD_REQUEST)
+
+		when:
+			final responseError = fromJson(response.contentAsString, Map)
+
+		then:
+			resultContentIs(uri(), responseError, BAD_REQUEST, expectedMessage)
+
+		where:
+			invalidOffer                                                                                             | expectedMessage
+			[startTime: '16:04', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0]]      | "The startDate must not be empty. Value 'null' for startDate not excepted."
+			[startDate: '2002-04-18', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0]] | "The startTime must not be empty. Value 'null' for startTime not excepted."
+	}
+
 	def "A put request with a missing target system id should respond with status code 400 and a meaningful error message"() {
 		when:
 			final response = doPut(uri(), toJson(invalidOffer))
@@ -272,24 +304,28 @@ class OfferPutRequestTest extends RequestSpecification {
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
-			final expectedMessage = 'The list of target system ids must not be empty'
+			final expectedMessage = 'The list of targetSystem ids must not be empty'
 
 		then:
 			resultContentIs(uri(), responseError, BAD_REQUEST, expectedMessage)
 
 		where:
-			invalidOffer                                  | _
-			[userId: '13']                                | _
-			[userId: '14', targetSystemIds: null]         | _
-			[userId: '15', targetSystemIds: []]           | _
-			[userId: '16', targetSystemIds: [null]]       | _
-			[userId: '17', targetSystemIds: [null, null]] | _
+			invalidOffer                                                                               | _
+			[userId: '13', startDate: '2008-10-03', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0]]                                | _
+			[userId: '14', startDate: '2008-10-03', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: null]         | _
+			[userId: '15', startDate: '2008-10-03', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: []]           | _
+			[userId: '16', startDate: '2008-10-03', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [null]]       | _
+			[userId: '17', startDate: '2008-10-03', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [null, null]] | _
 	}
 
 	def "A put request with a not existing target system id should respond with status code 400 and a meaningful error message"() {
 		given:
 			final notExistingId = UUID.randomUUID()
 			final invalidOffer = new Offer(userId: '18',
+			                               startDate: LocalDate.now(),
+			                               startTime: LocalTime.now(),
+										   origin: [latitude: 0, longitude: 0],
+										   destination: [latitude: 0, longitude: 0],
 			                               targetSystemIds: [targetSystemId1(), notExistingId])
 
 		when:
@@ -330,6 +366,10 @@ class OfferPutRequestTest extends RequestSpecification {
 		given: 
 			final updateOffer = new Offer(id: existingId(),
 			                              userId: '20',
+										  startDate: LocalDate.now(),
+										  startTime: LocalTime.of(5, 25, 0, 0),
+										  origin: [latitude: 0, longitude: 0],
+										  destination: [latitude: 0, longitude: 0],
 			                              targetSystemIds: [null, targetSystemId1()])
 
 		when:
@@ -348,5 +388,31 @@ class OfferPutRequestTest extends RequestSpecification {
 			getResponseOffer.id == updateOffer.id
 			getResponseOffer.targetSystemIds == updateOffer.targetSystemIds
 			getResponseOffer == updateOffer
+	}
+
+	@Issue("#30")
+	def "A put request with a missing origin, destination, latitude or longitude should respond with status code 400 and a meaningful error message"() {
+		when:
+			final response = doPut(uri(), toJson(invalidOffer))
+
+		then:
+			resultIs(response, BAD_REQUEST)
+
+		when:
+			final responseError = fromJson(response.contentAsString, Map)
+
+		then:
+			resultContentIs(uri(), responseError, BAD_REQUEST, expectedMessage)
+
+		where:
+			invalidOffer                                                                                                                    | expectedMessage
+			[startDate: '1989-02-14', startTime: '06:14', destination: [latitude: 0, longitude: 0]]                                         | "The origin must not be empty. Value 'null' for origin not excepted."
+			[startDate: '1989-02-14', startTime: '06:14', origin: [latitude: 0, longitude: 0]]                                              | "The destination must not be empty. Value 'null' for destination not excepted."
+			[startDate: '1989-02-14', startTime: '06:14', origin: [latitude: 0], destination: [latitude: 0, longitude: 0]]                  | "The longitude must not be empty. Value 'null' for origin.longitude not excepted."
+			[startDate: '1989-02-14', startTime: '06:14', origin: [longitude: 0], destination: [latitude: 0, longitude: 0]]                 | "The latitude must not be empty. Value 'null' for origin.latitude not excepted."
+			[startDate: '1989-02-14', startTime: '06:14', origin: [latitude: 0, longitude: 0], destination: [latitude: 0]]                  | "The longitude must not be empty. Value 'null' for destination.longitude not excepted."
+			[startDate: '1989-02-14', startTime: '06:14', origin: [latitude: 0, longitude: 0], destination: [longitude: 0]]                 | "The latitude must not be empty. Value 'null' for destination.latitude not excepted."
+			[startDate: '1989-02-14', startTime: '06:14', origin: [latitude: 100, longitude: 0], destination: [latitude: 0, longitude: 0]]  | "must be less than or equal to 90. Value '100.0' for origin.latitude not excepted."
+			[startDate: '1989-02-14', startTime: '06:14', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: -250]] | "must be greater than or equal to -180. Value '-250.0' for destination.longitude not excepted."
 	}
 }
