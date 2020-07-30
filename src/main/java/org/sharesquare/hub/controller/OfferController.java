@@ -45,7 +45,7 @@ public class OfferController {
     private static final Logger log = LoggerFactory.getLogger(OfferController.class);
 
     @Autowired
-    OfferService offerService;
+    private OfferService offerService;
 
     @Autowired
     private OfferConverter offerConverter;

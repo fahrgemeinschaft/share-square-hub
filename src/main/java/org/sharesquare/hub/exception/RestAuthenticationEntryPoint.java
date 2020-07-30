@@ -25,7 +25,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	private static final Logger log = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
 
 	@Autowired
-	ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {

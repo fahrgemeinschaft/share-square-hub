@@ -38,7 +38,7 @@ public class TargetSystemController {
 	private static final Logger log = LoggerFactory.getLogger(TargetSystemController.class);
 
 	@Autowired
-	TargetSystemService targetSystemService;
+	private TargetSystemService targetSystemService;
 
 	@Autowired
 	private TargetSystemConverter targetSystemConverter;
