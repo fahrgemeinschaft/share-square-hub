@@ -3,8 +3,10 @@ package org.sharesquare.hub.conversion;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sharesquare.hub.model.data.EntityClient;
 import org.sharesquare.hub.model.data.EntityConnector;
 import org.sharesquare.hub.model.data.EntityTargetSystem;
+import org.sharesquare.model.Client;
 import org.sharesquare.model.Connector;
 import org.sharesquare.model.TargetSystem;
 import org.slf4j.Logger;
@@ -33,6 +35,7 @@ public class TargetSystemConverter {
 		entityTargetSystem.setDataProtectionRegulations(targetSystem.getDataProtectionRegulations());
 		entityTargetSystem.setConnector(
 				apiToEntity(targetSystem.getConnector()));
+		entityTargetSystem.setActive(targetSystem.isActive());
 		return entityTargetSystem;
 	}
 
@@ -40,11 +43,35 @@ public class TargetSystemConverter {
 		if (connector != null) {
 			EntityConnector entityConnector = new EntityConnector();
 			entityConnector.setId(connector.getId());
-			entityConnector.setOfferUpdateWebhook(connector.getOfferUpdateWebhook());
-			entityConnector.setAliveCheckWebhook(connector.getAliveCheckWebhook());
+			if (connector.getOfferUpdateWebhook() != null) {
+				entityConnector.setOfferUpdateWebhook(
+						connector.getOfferUpdateWebhook().toString());
+			}
+			if (connector.getAliveCheckWebhook() != null) {
+				entityConnector.setAliveCheckWebhook(
+						connector.getAliveCheckWebhook().toString());
+			}
+			entityConnector.setApikey(connector.getApikey());
+			if (connector.getClients() != null) {
+				List<EntityClient> entityClients = new ArrayList<>();
+				for (Client client : connector.getClients()) {
+					if (client != null) {
+						entityClients.add(apiToEntity(client));
+					}
+				}
+				entityConnector.setClients(entityClients);
+			}
 			return entityConnector;
 		}
 		return null;
+	}
+
+	private EntityClient apiToEntity(final Client client) {
+		EntityClient entityClient = new EntityClient();
+		entityClient.setId(client.getId());
+		entityClient.setName(client.getName());
+		entityClient.setAuthkey(client.getAuthkey());
+		return entityClient;
 	}
 
 	public TargetSystem entityToApi(final EntityTargetSystem entityTargetSystem) {
@@ -55,20 +82,8 @@ public class TargetSystemConverter {
 		targetSystem.setVanityUrl(entityTargetSystem.getVanityUrl());
 		targetSystem.setContentLanguage(entityTargetSystem.getContentLanguage());
 		targetSystem.setDataProtectionRegulations(entityTargetSystem.getDataProtectionRegulations());
-		targetSystem.setConnector(
-				entityToApi(entityTargetSystem.getConnector()));
+		targetSystem.setActive(entityTargetSystem.isActive());
 		return targetSystem;
-	}
-
-	private Connector entityToApi(final EntityConnector entityConnector) {
-		if (entityConnector != null) {
-			Connector connector = new Connector();
-			connector.setId(entityConnector.getId());
-			connector.setOfferUpdateWebhook(entityConnector.getOfferUpdateWebhook());
-			connector.setAliveCheckWebhook(entityConnector.getAliveCheckWebhook());
-			return connector;
-		}
-		return null;
 	}
 
 	public List<TargetSystem> entityToApi(final List<EntityTargetSystem> entityTargetSystems) {
