@@ -36,12 +36,12 @@ public class TargetSystemTripConverter {
 		List<TripRouting> routings = new ArrayList<>();
 		TripRouting routing = new TripRouting();
 		Place place = new Place();
-		place.setAddress("");
+		place.setAddress(" ");
 		place.setLatitude(entityOffer.getOrigin().getLatitude());
 		place.setLongitude(entityOffer.getOrigin().getLongitude());
 		routing.setOrigin(place);
 		place = new Place();
-		place.setAddress("");
+		place.setAddress(" ");
 		place.setLatitude(entityOffer.getDestination().getLatitude());
 		place.setLongitude(entityOffer.getDestination().getLongitude());
 		routing.setDestination(place);
