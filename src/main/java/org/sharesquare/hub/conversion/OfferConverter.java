@@ -175,7 +175,7 @@ public class OfferConverter {
 			offer.setTargetSystemIds(targetSystemIds);
 		}
 		if (entityOffer.getPreferences() != null) {
-			List<Preference> preferences = new ArrayList<>();
+			List<Preference<?>> preferences = new ArrayList<>();
 			for (EntityPreference<?> entityPreference : entityOffer.getPreferences()) {
 				if (entityPreference != null) {
 					Preference<?> preference = null;
