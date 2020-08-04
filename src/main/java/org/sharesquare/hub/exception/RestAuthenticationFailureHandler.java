@@ -24,7 +24,7 @@ public class RestAuthenticationFailureHandler implements AuthenticationFailureHa
 	private static final Logger log = LoggerFactory.getLogger(RestAuthenticationFailureHandler.class);
 
 	@Autowired
-	ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,

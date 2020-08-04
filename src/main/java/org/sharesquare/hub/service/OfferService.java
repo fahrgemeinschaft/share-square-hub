@@ -25,26 +25,9 @@ public class OfferService {
 
     @Autowired
     private ConnectorService connectorService;
-
-    /**
-     * Persist offer locally, then trigger connectors to forward to other portals.
-     * @param offer
-     * @return the created offer with an ID set.
-     */
-    public Optional<Offer> create(Offer offer){
-        //any uuid will do.
-        if(offer.getId()==null){
-            offer.setId(UUID.randomUUID());
-        }
-        /*
-        final Optional<Offer> result = offerRepository.create(offer);
-        if(result.isPresent()) {
-            connectorService.updateOffer(result.get());
-        }
-        return result;
-        */
-        return null;
-    }
+    
+    @Autowired
+    private OfferTargetStatusService offerTargetStatusService;
 
 	public Offer getOffer(final UUID id) {
 		Optional<EntityOffer> entityOffer = offerRepository.findById(id);
@@ -57,6 +40,8 @@ public class OfferService {
 
 	public Offer addOffer(final Offer offer) {
 		EntityOffer savedOffer = save(null, offer);
+		offerTargetStatusService.init(savedOffer);
+		connectorService.addOffer(savedOffer);
 		return offerConverter.entityToApi(savedOffer);
 	}
 
@@ -80,7 +65,9 @@ public class OfferService {
 	}
 
 	public boolean deleteOffer(final UUID id) {
-		if (offerRepository.existsById(id)) {
+		Optional<EntityOffer> entityOffer = offerRepository.findById(id);
+		if (entityOffer.isPresent()) {
+			offerTargetStatusService.remove(entityOffer.get());
 			offerRepository.deleteById(id);
 			return true;
 		}

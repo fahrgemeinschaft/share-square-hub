@@ -11,6 +11,7 @@ import org.sharesquare.model.Connector;
 import org.sharesquare.model.connector.ConnectorState;
 import org.sharesquare.repository.IRepository;
 import org.sharesquare.repository.SimpleInMemoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -29,6 +30,9 @@ public class SystemConfiguration {
     @Value("${custom.data.example.usage}")
 	private boolean useExamples;
 
+    @Autowired
+    private ExampleData exampleData;
+
     @Bean
     IRepository<Connector> createConnectorRepo(){
         return new SimpleInMemoryRepository<Connector>();
@@ -42,7 +46,7 @@ public class SystemConfiguration {
 	@Bean
 	public ApplicationRunner initializer(TargetSystemRepository repository) {
 		final List<EntityTargetSystem> exampleTargetSystems = useExamples ?
-				ExampleData.getEntityTargetSystems() : new ArrayList<>();
+				exampleData.getEntityTargetSystems() : new ArrayList<>();
 		return args -> repository.saveAll(exampleTargetSystems);
 	}
 }

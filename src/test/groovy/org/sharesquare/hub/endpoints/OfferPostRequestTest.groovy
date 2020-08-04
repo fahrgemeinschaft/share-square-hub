@@ -9,6 +9,9 @@ import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
 import static org.springframework.http.MediaType.TEXT_XML
 
+import java.time.LocalDate
+import java.time.LocalTime
+
 import org.sharesquare.model.Offer
 
 import spock.lang.Issue
@@ -18,12 +21,7 @@ class OfferPostRequestTest extends RequestSpecification {
 	@Issue("#4,#19")
 	def "A valid post request should work and return 201"() {
 		when:
-			def requestOffer = null
-			if (example == 1) {
-				requestOffer = "{\"$userId\": \"1\", \"$targetSystemIds\": [\"${targetSystemId1()}\"]}"
-			} else {
-				requestOffer = exampleOffer()
-			}
+			def requestOffer = (example == 1) ? defaultOffer() : exampleOffer()
 			// StackOverflowError when using groovy.json.JsonOutput.toJson with java.time.ZoneId
 			// https://issues.apache.org/jira/browse/GROOVY-7682
 			final response = doPost(offersUri, requestOffer)
@@ -132,6 +130,10 @@ class OfferPostRequestTest extends RequestSpecification {
 	def "A post request with umlaut should work and return 201"() {
 		given:
 			def offer = new Offer(userId: '\u00fc', // ue
+			                      startDate: LocalDate.now(),
+			                      startTime: LocalTime.of(7, 21, 0, 0),
+			                      origin: [latitude: 0, longitude: 0],
+			                      destination: [latitude: 0, longitude: 0],
 			                      targetSystemIds: [targetSystemId1()])
 
 		when:
@@ -162,6 +164,8 @@ class OfferPostRequestTest extends RequestSpecification {
 		given:
 			final offer = [startTime: '08:30',
 			               startDate: '2013-12-20',
+			               origin: [latitude: 0, longitude: 0],
+			               destination: [latitude: 0, longitude: 0],
 			               targetSystemIds: [targetSystemId1()]]
 
 		when:
@@ -195,6 +199,10 @@ class OfferPostRequestTest extends RequestSpecification {
 	def "A post request with startTimezone should work and return 201"() {
 		given:
 			final offer = [startTimezone: 'Europe/Paris',
+			               startDate: '2007-05-21',
+			               startTime: '07:16',
+			               origin: [latitude: 0, longitude: 0],
+			               destination: [latitude: 0, longitude: 0],
 			               targetSystemIds: [targetSystemId1()]]
 
 		when:
@@ -240,6 +248,26 @@ class OfferPostRequestTest extends RequestSpecification {
 			[startTimezone: '1 7'] | _
 	}
 
+	@Issue("#30")
+	def "A post request with a missing startTime or startDate should respond with status code 400 and a meaningful error message"() {
+		when:
+			final response = doPost(offersUri, toJson(invalidOffer))
+
+		then:
+			resultIs(response, BAD_REQUEST)
+
+		when:
+			final responseError = fromJson(response.contentAsString, Map)
+
+		then:
+			resultContentIs(offersUri, responseError, BAD_REQUEST, expectedMessage)
+
+		where:
+			invalidOffer                                                                                             | expectedMessage
+			[startTime: '19:15', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0]]      | "The startDate must not be empty. Value 'null' for startDate not excepted."
+			[startDate: '2001-05-19', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0]] | "The startTime must not be empty. Value 'null' for startTime not excepted."
+	}
+
 	def "A post request with a missing target system id should respond with status code 400 and a meaningful error message"() {
 		when:
 			final response = doPost(offersUri, toJson(invalidOffer))
@@ -249,24 +277,28 @@ class OfferPostRequestTest extends RequestSpecification {
 
 		when:
 			final responseError = fromJson(response.contentAsString, Map)
-			final expectedMessage = 'The list of target system ids must not be empty'
+			final expectedMessage = 'The list of targetSystem ids must not be empty'
 
 		then:
 			resultContentIs(offersUri, responseError, BAD_REQUEST, expectedMessage)
 
 		where:
-			invalidOffer                                 | _
-			[userId: '5']                                | _
-			[userId: '6', targetSystemIds: null]         | _
-			[userId: '7', targetSystemIds: []]           | _
-			[userId: '8', targetSystemIds: [null]]       | _
-			[userId: '9', targetSystemIds: [null, null]] | _
+			invalidOffer                                                                                                                                                             | _
+			[userId: '5', startDate: '2009-11-05', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0]]                                | _
+			[userId: '6', startDate: '2009-11-05', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: null]         | _
+			[userId: '7', startDate: '2009-11-05', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: []]           | _
+			[userId: '8', startDate: '2009-11-05', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [null]]       | _
+			[userId: '9', startDate: '2009-11-05', startTime: '07:06', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: 0], targetSystemIds: [null, null]] | _
 	}
 
 	def "A post request with a not existing target system id should respond with status code 400 and a meaningful error message"() {
 		given:
 			final notExistingId = UUID.randomUUID()
 			final invalidOffer = new Offer(userId: '10',
+			                               startDate: LocalDate.now(),
+			                               startTime: LocalTime.now(),
+			                               origin: [latitude: 0, longitude: 0],
+			                               destination: [latitude: 0, longitude: 0],
 			                               targetSystemIds: [targetSystemId1(), notExistingId])
 
 		when:
@@ -306,6 +338,10 @@ class OfferPostRequestTest extends RequestSpecification {
 	def "A post request with an exiting target system id should work and return 201"() {
 		given:
 			final offer = new Offer(userId: '12',
+			                        startDate: LocalDate.now(), 
+			                        startTime: LocalTime.of(7, 20, 0, 0),
+			                        origin: [latitude: 0, longitude: 0],
+			                        destination: [latitude: 0, longitude: 0],
 			                        targetSystemIds: [null, targetSystemId1()])
 
 		when:
@@ -333,5 +369,31 @@ class OfferPostRequestTest extends RequestSpecification {
 			getResponseOffer.id == responseOffer.id
 			getResponseOffer.targetSystemIds == offer.targetSystemIds
 			getResponseOffer == offer
+	}
+
+	@Issue("#30")
+	def "A post request with a missing origin, destination, latitude or longitude should respond with status code 400 and a meaningful error message"() {
+		when:
+			final response = doPost(offersUri, toJson(invalidOffer))
+
+		then:
+			resultIs(response, BAD_REQUEST)
+
+		when:
+			final responseError = fromJson(response.contentAsString, Map)
+
+		then:
+			resultContentIs(offersUri, responseError, BAD_REQUEST, expectedMessage)
+
+		where:
+			invalidOffer                                                                                                                    | expectedMessage
+			[startDate: '1999-11-05', startTime: '07:16', destination: [latitude: 0, longitude: 0]]                                         | "The origin must not be empty. Value 'null' for origin not excepted."
+			[startDate: '1999-11-05', startTime: '07:16', origin: [latitude: 0, longitude: 0]]                                              | "The destination must not be empty. Value 'null' for destination not excepted."
+			[startDate: '1999-11-05', startTime: '07:16', origin: [latitude: 0], destination: [latitude: 0, longitude: 0]]                  | "The longitude must not be empty. Value 'null' for origin.longitude not excepted."
+			[startDate: '1999-11-05', startTime: '07:16', origin: [longitude: 0], destination: [latitude: 0, longitude: 0]]                 | "The latitude must not be empty. Value 'null' for origin.latitude not excepted."
+			[startDate: '1999-11-05', startTime: '07:16', origin: [latitude: 0, longitude: 0], destination: [latitude: 0]]                  | "The longitude must not be empty. Value 'null' for destination.longitude not excepted."
+			[startDate: '1999-11-05', startTime: '07:16', origin: [latitude: 0, longitude: 0], destination: [longitude: 0]]                 | "The latitude must not be empty. Value 'null' for destination.latitude not excepted."
+			[startDate: '1999-11-05', startTime: '07:16', origin: [latitude: 100, longitude: 0], destination: [latitude: 0, longitude: 0]]  | "must be less than or equal to 90. Value '100.0' for origin.latitude not excepted."
+			[startDate: '1999-11-05', startTime: '07:16', origin: [latitude: 0, longitude: 0], destination: [latitude: 0, longitude: -250]] | "must be greater than or equal to -180. Value '-250.0' for destination.longitude not excepted."
 	}
 }

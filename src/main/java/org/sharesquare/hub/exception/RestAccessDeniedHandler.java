@@ -24,7 +24,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
 	private static final Logger log = LoggerFactory.getLogger(RestAccessDeniedHandler.class);
 
 	@Autowired
-	ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e)

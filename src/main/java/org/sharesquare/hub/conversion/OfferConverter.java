@@ -2,9 +2,7 @@ package org.sharesquare.hub.conversion;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -132,16 +130,13 @@ public class OfferConverter {
 	}
 
 	private EntityLocation apiToEntity(final Location location) {
-		if (location != null) {
-			EntityLocation entityLocation = new EntityLocation();
-			entityLocation.setId(location.getId());
-			entityLocation.setLatitude(location.getLatitude());
-			entityLocation.setLongitude(location.getLongitude());
-			entityLocation.setName(location.getName());
-			entityLocation.setType(location.getType());
-			return entityLocation;
-		}
-		return null;
+		EntityLocation entityLocation = new EntityLocation();
+		entityLocation.setId(location.getId());
+		entityLocation.setLatitude(location.getLatitude());
+		entityLocation.setLongitude(location.getLongitude());
+		entityLocation.setName(location.getName());
+		entityLocation.setType(location.getType());
+		return entityLocation;
 	}
 
 	private EntityContactOption apiToEntity(final ContactOption contactOption) {
@@ -180,7 +175,7 @@ public class OfferConverter {
 			offer.setTargetSystemIds(targetSystemIds);
 		}
 		if (entityOffer.getPreferences() != null) {
-			List<Preference> preferences = new ArrayList<>();
+			List<Preference<?>> preferences = new ArrayList<>();
 			for (EntityPreference<?> entityPreference : entityOffer.getPreferences()) {
 				if (entityPreference != null) {
 					Preference<?> preference = null;
@@ -230,16 +225,13 @@ public class OfferConverter {
 	}
 
 	private Location entityToApi(final EntityLocation entitylocation) {
-		if (entitylocation != null) {
-			Location location = new Location();
-			location.setId(entitylocation.getId());
-			location.setLatitude(entitylocation.getLatitude());
-			location.setLongitude(entitylocation.getLongitude());
-			location.setName(entitylocation.getName());
-			location.setType(entitylocation.getType());
-			return location;
-		}
-		return null;
+		Location location = new Location();
+		location.setId(entitylocation.getId());
+		location.setLatitude(entitylocation.getLatitude());
+		location.setLongitude(entitylocation.getLongitude());
+		location.setName(entitylocation.getName());
+		location.setType(entitylocation.getType());
+		return location;
 	}
 
 	private ContactOption entityToApi(final EntityContactOption entityContactOption) {
