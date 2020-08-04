@@ -27,11 +27,11 @@ public class EntityOfferTargetStatus {
 	private UUID targetSystemId;
 
 	public enum Status {
-		IN_PROGRESS,
+		PROCESSING,
 		FAILED,
 		SUCCESS
 	}
 
 	@Enumerated(EnumType.STRING)
-	private Status status = Status.IN_PROGRESS;
+	private Status status = Status.PROCESSING;
 }
