@@ -2,10 +2,12 @@ package org.sharesquare.hub.endpoints
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.FORBIDDEN
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE
+import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.http.MediaType.TEXT_XML
 
 import org.sharesquare.model.Connector
@@ -15,7 +17,7 @@ import org.springframework.beans.factory.annotation.Value
 import spock.lang.Issue
 import spock.lang.Stepwise
 
-@Issue("#25,#19,#20")
+@Issue("#25,#19,#20,#29")
 @Stepwise
 class TargetSystemsGetRequestTest extends RequestSpecification {
 
@@ -57,9 +59,10 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 			}
 	}
 
+	@Issue("#11")
 	def "A valid post request should work and return 201"() {
 		when:
-			final response = doPost(targetSystemsUri, targetSystem)
+			final response = doPost(targetSystemsUri, targetSystem, APPLICATION_JSON, accessTokenInTargetScope())
 
 		then:
 			resultIs(response, CREATED)
@@ -101,7 +104,7 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 			final emptyRequestBody = ''
 
 		when:
-			final response = doPost(targetSystemsUri, emptyRequestBody)
+			final response = doPost(targetSystemsUri, emptyRequestBody, APPLICATION_JSON, accessTokenInTargetScope())
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -119,7 +122,7 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 			final invalidJson = '{{}{!'
 
 		when:
-			final response = doPost(targetSystemsUri, invalidJson)
+			final response = doPost(targetSystemsUri, invalidJson, APPLICATION_JSON, accessTokenInTargetScope())
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -137,7 +140,7 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 			final invalidTargetSystem = [vanityUrl: []]
 
 		when:
-			final response = doPost(targetSystemsUri, toJson(invalidTargetSystem))
+			final response = doPost(targetSystemsUri, toJson(invalidTargetSystem), APPLICATION_JSON, accessTokenInTargetScope())
 
 		then:
 			resultIs(response, BAD_REQUEST)
@@ -155,7 +158,7 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 			final targetSystemAsXml = "<targetSystem><name>nobody</name></targetSystemr>"
 
 		when:
-			final response = doPost(targetSystemsUri, targetSystemAsXml, TEXT_XML)
+			final response = doPost(targetSystemsUri, targetSystemAsXml, TEXT_XML, accessTokenInTargetScope())
 
 		then:
 			resultIs(response, UNSUPPORTED_MEDIA_TYPE)
@@ -170,8 +173,8 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 
 	def "A delete request with an existing id should work and respond with status code 204"() {
 		when:
-			final id = fromJson(doPost(targetSystemsUri, targetSystem).contentAsString, TargetSystem).id
-			final response = doDelete("$targetSystemsUri/$id")
+			final id = fromJson(doPost(targetSystemsUri, targetSystem, APPLICATION_JSON, accessTokenInTargetScope()).contentAsString, TargetSystem).id
+			final response = doDelete("$targetSystemsUri/$id", accessTokenInTargetScope())
 
 		then:
 			response.status == NO_CONTENT.value
@@ -196,7 +199,7 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 			final id = UUID.randomUUID()
 
 		when:
-			final response = doDelete("$targetSystemsUri/$id")
+			final response = doDelete("$targetSystemsUri/$id", accessTokenInTargetScope())
 
 		then:
 			response.status == NOT_FOUND.value
@@ -213,7 +216,7 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 
 	def "A delete request with an invalid UUID or an empty id should respond with status code 400 and a meaningful error message"() {
 		when:
-			final response = doDelete("$targetSystemsUri/$id")
+			final response = doDelete("$targetSystemsUri/$id", accessTokenInTargetScope())
 
 		then:
 			resultIs(response, BAD_REQUEST)

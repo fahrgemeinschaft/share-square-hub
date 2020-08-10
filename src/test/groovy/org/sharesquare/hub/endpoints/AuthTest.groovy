@@ -1,11 +1,13 @@
 package org.sharesquare.hub.endpoints
 
 import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
+import static org.sharesquare.hub.endpoints.OfferUtil.userId
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpHeaders.WWW_AUTHENTICATE
 import static org.springframework.http.HttpStatus.FORBIDDEN
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
+import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 
 import org.springframework.beans.factory.annotation.Value
@@ -58,7 +60,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request with an invalid access token should respond with status code 401 and a meaningful error message"() {
 		when:
-			final response = doPostWithAuthHeaderValue(offersUri, "Bearer $invalid")
+			final response = doPost(offersUri, defaultOffer(), APPLICATION_JSON, invalid)
 
 		then:
 			resultIs(response, UNAUTHORIZED)
@@ -96,7 +98,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request with a malformed or empty access token should respond with status code 401 and a meaningful error message in the response header"() {
 		when:
-			final response = doPostWithAuthHeaderValue(offersUri, "Bearer $malformed")
+			final response = doPost(offersUri, defaultOffer(), APPLICATION_JSON, malformed)
 
 		then:
 			with (response) {
@@ -190,7 +192,7 @@ class AuthTest extends RequestSpecification {
 
 	def "A request with an expired access token should respond with status code 401 and a meaningful error message"() {
 		when:
-			def response = doPostWithAuthHeaderValue(offersUri, "Bearer $tokenExpired")
+			def response = doPost(offersUri, defaultOffer(), APPLICATION_JSON, tokenExpired)
 
 		then:
 			resultIs(response, UNAUTHORIZED)
@@ -204,9 +206,83 @@ class AuthTest extends RequestSpecification {
 			resultContentIs(offersUri, responseError, UNAUTHORIZED, expectedMessage)
 	}
 
+	@Issue("#29")
 	def "A request with an access token not in the scope should respond with status code 403 and a meaningful error message"() {
 		when:
-			final response = doPostWithAuthHeaderValue(offersUri, "Bearer ${accessTokenNotInScope()}")
+			def response = null
+			switch(method) {
+				case 'post':
+					response = doPost(path, '{}', APPLICATION_JSON, accessTokenNotInScope())
+					break
+				case 'put':
+					response = doPut(path, '{}', APPLICATION_JSON, accessTokenNotInScope())
+					break
+				case 'delete':
+					response = doDelete(path, accessTokenNotInScope())
+					break
+				case 'get1':
+					response = doGet(path, accessTokenNotInScope())
+					break
+				case 'get2':
+					response = doGet(path, userId, 'testuser', ' ', '', ' ', '', accessTokenNotInScope())
+					break
+				default:
+					response = 'test case missing'
+			}
+
+		then:
+			resultIs(response, FORBIDDEN)
+
+		when:	
+			final responseError = fromJson(response.contentAsString, Map)
+
+		then:
+			resultContentIs(path, responseError, FORBIDDEN, 'Access is denied')
+
+		where:
+			method    | path
+			'post'    | offersUri
+			'put'     | "$offersUri/${UUID.randomUUID()}"
+			'delete'  | "$offersUri/${UUID.randomUUID()}"
+			'get1'    | "$offersUri/${UUID.randomUUID()}"
+			'get2'    | offersUri
+
+			'post'    | targetSystemsUri
+			'delete'  | "$targetSystemsUri/${UUID.randomUUID()}"
+			'get2'    | targetSystemsUri
+	}
+
+	@Issue("#29")
+	def "A request with an access token in the wrong scope should respond with status code 403 and a meaningful error message"() {
+		when:
+			def response = null
+			switch(method) {
+				case 'post':
+					if (path.startsWith(offersUri)) {
+						response = doPost(path, '{}', APPLICATION_JSON, accessTokenInTargetScope())
+					} else {
+						response = doPost(path, '{}', APPLICATION_JSON, accessToken())
+					}
+					break
+				case 'put':
+					response = doPut(path, '{}', APPLICATION_JSON, accessTokenInTargetScope())
+					break
+				case 'delete':
+					if (path.startsWith(offersUri)) {
+						response = doDelete(path, accessTokenInTargetScope())
+					} else {
+						response = doDelete(path, accessToken())
+					}
+					break
+				case 'get1':
+					response = doGet(path, accessTokenInTargetScope())
+					break
+				case 'get2':
+					response = doGet(path, userId, 'testuser', ' ', '', ' ', '', accessTokenInTargetScope())
+					break
+				default:
+					response = 'test case missing'
+			}
 
 		then:
 			resultIs(response, FORBIDDEN)
@@ -215,6 +291,18 @@ class AuthTest extends RequestSpecification {
 			final responseError = fromJson(response.contentAsString, Map)
 
 		then:
-			resultContentIs(offersUri, responseError, FORBIDDEN, 'Access is denied')
+			resultContentIs(path, responseError, FORBIDDEN, 'Access is denied')
+
+		where:
+			method    | path
+			'post'    | offersUri
+			'put'     | "$offersUri/${UUID.randomUUID()}"
+			'delete'  | "$offersUri/${UUID.randomUUID()}"
+			'get1'    | "$offersUri/${UUID.randomUUID()}"
+			'get2'    | offersUri
+
+			'post'    | targetSystemsUri
+			'delete'  | "$targetSystemsUri/${UUID.randomUUID()}"
+			'get2'    | targetSystemsUri
 	}
 }
