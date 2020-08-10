@@ -25,7 +25,7 @@ public class TargetSystemService {
 	private OfferTargetStatusService offerTargetStatusService;
 
 	@Autowired
-    private AuthorizationService authorizationService;
+	private AuthorizationService authorizationService;
 
 	public TargetSystem addTargetSystem(final TargetSystem targetSystem) {
 		String clientId = authorizationService.getClientId();
