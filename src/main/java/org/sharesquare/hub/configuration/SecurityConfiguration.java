@@ -1,5 +1,9 @@
 package org.sharesquare.hub.configuration;
 
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.sharesquare.commons.web.security.oauth.resourceserver.KeycloakRealmRoleConverter;
@@ -49,8 +53,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${SHARE2_USER_ID_CLAIM:user_id}")
     private String userIdClaim;
 
-	@Value("${custom.auth.server.scope}")
-	private String scope;
+	@Value("${custom.auth.server.scope.offers}")
+	private String offersScope;
+
+	@Value("${custom.auth.server.scope.target}")
+	private String targetScope;
 
 	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
 	private String issuerUri;
@@ -97,7 +104,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Swagger UI
 				.antMatchers("/h2-console/**").permitAll() // H2 Web Console
 				.antMatchers("/actuator/**").permitAll()
-				.mvcMatchers("/offers/**", "/targetSystems/**").hasAuthority(SCOPE_PREFIX + scope)
+				.mvcMatchers("/offers/**").hasAuthority(SCOPE_PREFIX + offersScope)
+				.mvcMatchers(GET, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + offersScope)
+				.mvcMatchers(POST, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + targetScope)
+				.mvcMatchers(DELETE, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + targetScope)
 				.anyRequest().authenticated()
 			)
 			.exceptionHandling()
