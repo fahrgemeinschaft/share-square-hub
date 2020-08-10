@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.sun.xml.bind.v2.TODO;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -66,10 +64,6 @@ public class ConnectorService {
 		List<EntityTargetSystem> targetSystems = targetSystemService.getEntityTargetSystems();
 		EntityConnector connector;
 		ClientResponse response;
-
-		TODO.checkSpec("https://github.com/fahrgemeinschaft/share-square-hub/issues/27");
-		entityOffer.setClientId(exampleTargetConnectorClientName);
-
 		for (EntityTargetSystem targetSystem : targetSystems) {
 			if (targetSystem.isActive()) {
 				connector = targetSystem.getConnector();
