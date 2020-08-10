@@ -220,10 +220,10 @@ class AuthTest extends RequestSpecification {
 				case 'delete':
 					response = doDelete(path, accessTokenNotInScope())
 					break
-				case 'get1':
+				case 'getById':
 					response = doGet(path, accessTokenNotInScope())
 					break
-				case 'get2':
+				case 'get':
 					response = doGet(path, userId, 'testuser', ' ', '', ' ', '', accessTokenNotInScope())
 					break
 				default:
@@ -244,12 +244,12 @@ class AuthTest extends RequestSpecification {
 			'post'    | offersUri
 			'put'     | "$offersUri/${UUID.randomUUID()}"
 			'delete'  | "$offersUri/${UUID.randomUUID()}"
-			'get1'    | "$offersUri/${UUID.randomUUID()}"
-			'get2'    | offersUri
+			'getById' | "$offersUri/${UUID.randomUUID()}"
+			'get'     | offersUri
 
 			'post'    | targetSystemsUri
 			'delete'  | "$targetSystemsUri/${UUID.randomUUID()}"
-			'get2'    | targetSystemsUri
+			'get'     | targetSystemsUri
 	}
 
 	@Issue("#29")
@@ -274,10 +274,10 @@ class AuthTest extends RequestSpecification {
 						response = doDelete(path, accessToken())
 					}
 					break
-				case 'get1':
+				case 'getById':
 					response = doGet(path, accessTokenInTargetScope())
 					break
-				case 'get2':
+				case 'get':
 					response = doGet(path, userId, 'testuser', ' ', '', ' ', '', accessTokenInTargetScope())
 					break
 				default:
@@ -298,11 +298,11 @@ class AuthTest extends RequestSpecification {
 			'post'    | offersUri
 			'put'     | "$offersUri/${UUID.randomUUID()}"
 			'delete'  | "$offersUri/${UUID.randomUUID()}"
-			'get1'    | "$offersUri/${UUID.randomUUID()}"
-			'get2'    | offersUri
+			'getById' | "$offersUri/${UUID.randomUUID()}"
+			'get'     | offersUri
 
 			'post'    | targetSystemsUri
 			'delete'  | "$targetSystemsUri/${UUID.randomUUID()}"
-			'get2'    | targetSystemsUri
+			'get'     | targetSystemsUri
 	}
 }
