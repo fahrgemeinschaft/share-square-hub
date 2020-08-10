@@ -59,6 +59,12 @@ class RequestSpecification extends Specification {
 	@Value("\${custom.auth.server.client.in.target.scope.secret}")
 	private clientInTargetScopeSecret;
 
+	@Value("\${custom.auth.server.client.in.target.scope.id2}")
+	private clientInTargetScopeId2;
+
+	@Value("\${custom.auth.server.client.in.target.scope.secret2}")
+	private clientInTargetScopeSecret2;
+
 	@Value("\${custom.auth.server.client.not.in.scope.id}")
 	private clientNotInScopeId;
 
@@ -219,6 +225,10 @@ class RequestSpecification extends Specification {
 	
 	def accessTokenInTargetScope() {
 		authServerResponse(clientInTargetScopeId, clientInTargetScopeSecret).data.access_token
+	}
+
+	def accessTokenInTargetScope2() {
+		authServerResponse(clientInTargetScopeId2, clientInTargetScopeSecret2).data.access_token
 	}
 
 	def accessTokenNotInScope() {

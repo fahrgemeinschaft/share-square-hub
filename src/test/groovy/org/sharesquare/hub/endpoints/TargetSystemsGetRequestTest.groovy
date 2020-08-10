@@ -99,6 +99,38 @@ class TargetSystemsGetRequestTest extends RequestSpecification {
 			exampleTargetSystem | 6
 	}
 
+	@Issue("#27")
+	def "Target system post and delete requests should only manage target systems from this client"() {
+		when:
+			final id1 = fromJson(doPost(targetSystemsUri, defaultTargetSystem, APPLICATION_JSON, accessTokenInTargetScope()).contentAsString, TargetSystem).id
+			final id2 = fromJson(doPost(targetSystemsUri, exampleTargetSystem, APPLICATION_JSON, accessTokenInTargetScope2()).contentAsString, TargetSystem).id
+
+		and:
+			final response = doGet(targetSystemsUri)
+			final responseTargetSystems = fromJson(response.contentAsString, TargetSystem[])
+			Set ids = []
+			responseTargetSystems.each {
+				if (it.id == id1 || it.id == id2) {
+					ids.add(it.id)
+				}
+			}
+
+		then:
+			ids == [id1, id2] as Set
+
+		when:
+			final response1 = doDelete("$targetSystemsUri/$id1", accessTokenInTargetScope2())
+			final response2 = doDelete("$targetSystemsUri/$id2", accessTokenInTargetScope())
+			final response3 = doDelete("$targetSystemsUri/$id1", accessTokenInTargetScope())
+			final response4 = doDelete("$targetSystemsUri/$id2", accessTokenInTargetScope2())
+
+		then:
+			response1.status == NOT_FOUND.value
+			response2.status == NOT_FOUND.value
+			response3.status == NO_CONTENT.value
+			response4.status == NO_CONTENT.value
+	}
+
 	def "A post request with an empty body should respond with status code 400 and a meaningful error message"() {
 		given:
 			final emptyRequestBody = ''
