@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -226,7 +225,7 @@ class RequestSpecification extends Specification {
 		authServerResponse(clientNotInScopeId, clientNotInScopeSecret).data.access_token
 	}
 
-	def doPost(uri, requestBody, MediaType mediaType = APPLICATION_JSON, accessToken = accessToken()) {
+	def doPost(uri, requestBody, mediaType = APPLICATION_JSON, accessToken = accessToken()) {
 		mvc.perform(
 				post(uri)
 					.header(AUTHORIZATION, "Bearer $accessToken")
