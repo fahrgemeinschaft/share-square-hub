@@ -53,52 +53,52 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${SHARE2_USER_ID_CLAIM:user_id}")
     private String userIdClaim;
 
-	@Value("${custom.auth.server.scope.offers}")
-	private String offersScope;
+    @Value("${custom.auth.server.scope.offers}")
+    private String offersScope;
 
-	@Value("${custom.auth.server.scope.target}")
-	private String targetScope;
+    @Value("${custom.auth.server.scope.target}")
+    private String targetScope;
 
-	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-	private String issuerUri;
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
 
-	private static final String SCOPE_PREFIX = "SCOPE_";
+    private static final String SCOPE_PREFIX = "SCOPE_";
 
-	@Bean
-	public JwtDecoder JwtDecoder() {
-		return JwtDecoders.fromIssuerLocation(issuerUri);
-	}
+    @Bean
+    public JwtDecoder JwtDecoder() {
+    	return JwtDecoders.fromIssuerLocation(issuerUri);
+    }
 
-	@Bean
-	RestAccessDeniedHandler accessDeniedHandler() {
-		return new RestAccessDeniedHandler();
-	}
+    @Bean
+    RestAccessDeniedHandler accessDeniedHandler() {
+    	return new RestAccessDeniedHandler();
+    }
 
-	@Bean
-	RestAuthenticationEntryPoint authenticationEntryPoint() {
-		return new RestAuthenticationEntryPoint();
-	}
+    @Bean
+    RestAuthenticationEntryPoint authenticationEntryPoint() {
+    	return new RestAuthenticationEntryPoint();
+    }
 
-	@Bean
-	RestAuthenticationFailureHandler authenticationFailureHandler() {
-		return new RestAuthenticationFailureHandler();
-	}
+    @Bean
+    RestAuthenticationFailureHandler authenticationFailureHandler() {
+    	return new RestAuthenticationFailureHandler();
+    }
 
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+    	return super.authenticationManagerBean();
+    }
 
-	@Autowired
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// do NOT call super.configure()
-	}
+    @Autowired
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    	// do NOT call super.configure()
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+    	http
 			.csrf(csrf -> csrf.disable())
 			.authorizeRequests(authorize -> authorize
 				.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Swagger UI
