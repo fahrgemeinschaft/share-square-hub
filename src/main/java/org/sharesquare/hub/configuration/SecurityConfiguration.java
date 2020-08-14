@@ -99,28 +99,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
     	http
-			.csrf(csrf -> csrf.disable())
-			.authorizeRequests(authorize -> authorize
-				.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Swagger UI
-				.antMatchers("/h2-console/**").permitAll() // H2 Web Console
-				.antMatchers("/actuator/**").permitAll()
-				.mvcMatchers("/offers/**").hasAuthority(SCOPE_PREFIX + offersScope)
-				.mvcMatchers(GET, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + offersScope)
-				.mvcMatchers(POST, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + targetScope)
-				.mvcMatchers(DELETE, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + targetScope)
-				.anyRequest().authenticated()
-			)
-			.exceptionHandling()
-				.accessDeniedHandler(accessDeniedHandler())
-				.authenticationEntryPoint(authenticationEntryPoint()).and()
-			.sessionManagement(cust -> cust.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+    		.csrf(csrf -> csrf.disable())
+    		.authorizeRequests(authorize -> authorize
+    			.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Swagger UI
+    			.antMatchers("/h2-console/**").permitAll() // H2 Web Console
+    			.antMatchers("/actuator/**").permitAll()
+    			.mvcMatchers("/offers/**").hasAuthority(SCOPE_PREFIX + offersScope)
+    			.mvcMatchers(GET, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + offersScope)
+    			.mvcMatchers(POST, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + targetScope)
+    			.mvcMatchers(DELETE, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + targetScope)
+    			.anyRequest().authenticated()
+    		)
+    		.exceptionHandling()
+    			.accessDeniedHandler(accessDeniedHandler())
+    			.authenticationEntryPoint(authenticationEntryPoint()).and()
+    		.sessionManagement(cust -> cust.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    		.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
 
-		BearerTokenAuthenticationFilter filter = new BearerTokenAuthenticationFilter(authenticationManagerBean());
-		filter.setAuthenticationFailureHandler(authenticationFailureHandler());
-		http.addFilterBefore(filter, BearerTokenAuthenticationFilter.class);
+    	BearerTokenAuthenticationFilter filter = new BearerTokenAuthenticationFilter(authenticationManagerBean());
+    	filter.setAuthenticationFailureHandler(authenticationFailureHandler());
+    	http.addFilterBefore(filter, BearerTokenAuthenticationFilter.class);
 
-		http.headers().frameOptions().disable(); // for H2 Web Console
+    	http.headers().frameOptions().disable(); // for H2 Web Console
     }
         /*
         http
