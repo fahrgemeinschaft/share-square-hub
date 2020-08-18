@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import org.sharesquare.hub.conversion.OfferConverter;
 import org.sharesquare.hub.model.data.*;
+import org.sharesquare.hub.model.data.preferences.EntityPreference;
 import org.sharesquare.hub.repository.OfferRepository;
 import org.sharesquare.model.Offer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +116,21 @@ public class OfferService {
 
 	private void setPreferenceIds(EntityOffer entityOffer) {
 		if (entityOffer.getPreferences() != null) {
-			for (EntityPreference<?> entityPreference : entityOffer.getPreferences()) {
+			EntityPreferences entityPreferences = entityOffer.getPreferences();
+			entityPreferences.setId(null);
+			setPreferenceItemIds(entityPreferences.getBooleanPreferences());
+			setPreferenceItemIds(entityPreferences.getDoublePreferences());
+			setPreferenceItemIds(entityPreferences.getIntegerPreferences());
+			setPreferenceItemIds(entityPreferences.getPaxGenderPreferences());
+			setPreferenceItemIds(entityPreferences.getPaxPetsPreferences());
+			setPreferenceItemIds(entityPreferences.getPaxSmokerPreferences());
+			setPreferenceItemIds(entityPreferences.getStringPreferences());
+		}
+	}
+
+	private <T> void setPreferenceItemIds(List<EntityPreference<T>> entityPreferenceItems) {
+		if (entityPreferenceItems != null) {
+			for (EntityPreference<?> entityPreference : entityPreferenceItems) {
 				if (entityPreference != null) {
 					entityPreference.setId(UUID.randomUUID());
 				}

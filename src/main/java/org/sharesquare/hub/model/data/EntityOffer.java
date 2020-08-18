@@ -17,10 +17,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.ManyToAny;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -66,14 +64,9 @@ public class EntityOffer extends BaseEntity {
 	@Embedded
 	private List<EntityTargetSystem> targetSystems;
 
-	@ManyToAny(metaDef = "PreferenceMetaDef",
-			   metaColumn = @Column(name = "preference_type"),
-			   fetch = FetchType.EAGER)
-	@Cascade({org.hibernate.annotations.CascadeType.ALL})
-	@JoinTable(name = "offer_preference_membership",
-	           joinColumns = @JoinColumn(name = "offer_id"),
-	           inverseJoinColumns = @JoinColumn(name = "preference_id"))
-	private List<EntityPreference<?>> preferences;
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "preferences")
+	private EntityPreferences preferences;
 
 	@Column(name = "additional_info")
 	private String additionalInfo;

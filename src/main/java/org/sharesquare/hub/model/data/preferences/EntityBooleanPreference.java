@@ -3,8 +3,7 @@ package org.sharesquare.hub.model.data.preferences;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.sharesquare.hub.model.data.EntityPreference;
-import org.sharesquare.model.Preference;
+import org.sharesquare.model.preferences.Preference;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,10 +16,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "boolean_preference")
 public class EntityBooleanPreference extends EntityPreference<Boolean> {
 
-	public EntityBooleanPreference(Preference<?> preference) {
+	public EntityBooleanPreference(Preference<Boolean> preference) {
 		super.setId(preference.getId());
 		super.setKey(preference.getKey());
-		this.value = (Boolean) preference.getValue();
+		this.value = preference.getValue();
 	}
 
 	private Boolean value;

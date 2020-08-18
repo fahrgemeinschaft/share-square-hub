@@ -5,8 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.sharesquare.hub.model.data.EntityPreference;
-import org.sharesquare.model.Preference;
+
+import org.sharesquare.model.preferences.Preference;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -15,10 +15,10 @@ import org.sharesquare.model.Preference;
 @Table(name = "double_preference")
 public class EntityDoublePreference extends EntityPreference<Double> {
 
-	public EntityDoublePreference(Preference<?> preference) {
+	public EntityDoublePreference(Preference<Double> preference) {
 		super.setId(preference.getId());
 		super.setKey(preference.getKey());
-		this.value = (Double) preference.getValue();
+		this.value = preference.getValue();
 	}
 
 	private Double value;

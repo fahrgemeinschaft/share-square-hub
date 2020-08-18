@@ -3,8 +3,7 @@ package org.sharesquare.hub.model.data.preferences;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.sharesquare.hub.model.data.EntityPreference;
-import org.sharesquare.model.Preference;
+import org.sharesquare.model.preferences.Preference;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,10 +16,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "string_preference")
 public class EntityStringPreference extends EntityPreference<String> {
 
-	public EntityStringPreference(Preference<?> preference) {
+	public EntityStringPreference(Preference<String> preference) {
 		super.setId(preference.getId());
 		super.setKey(preference.getKey());
-		this.value = (String) preference.getValue();
+		this.value = preference.getValue();
 	}
 
 	private String value;
