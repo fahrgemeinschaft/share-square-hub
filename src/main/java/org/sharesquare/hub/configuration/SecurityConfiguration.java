@@ -1,5 +1,9 @@
 package org.sharesquare.hub.configuration;
 
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.sharesquare.commons.web.security.oauth.resourceserver.KeycloakRealmRoleConverter;
@@ -49,68 +53,74 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${SHARE2_USER_ID_CLAIM:user_id}")
     private String userIdClaim;
 
-	@Value("${custom.auth.server.scope}")
-	private String scope;
+    @Value("${custom.auth.server.scope.offers}")
+    private String offersScope;
 
-	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-	private String issuerUri;
+    @Value("${custom.auth.server.scope.target}")
+    private String targetScope;
 
-	private static final String SCOPE_PREFIX = "SCOPE_";
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
 
-	@Bean
-	public JwtDecoder JwtDecoder() {
-		return JwtDecoders.fromIssuerLocation(issuerUri);
-	}
+    private static final String SCOPE_PREFIX = "SCOPE_";
 
-	@Bean
-	RestAccessDeniedHandler accessDeniedHandler() {
-		return new RestAccessDeniedHandler();
-	}
+    @Bean
+    public JwtDecoder JwtDecoder() {
+    	return JwtDecoders.fromIssuerLocation(issuerUri);
+    }
 
-	@Bean
-	RestAuthenticationEntryPoint authenticationEntryPoint() {
-		return new RestAuthenticationEntryPoint();
-	}
+    @Bean
+    RestAccessDeniedHandler accessDeniedHandler() {
+    	return new RestAccessDeniedHandler();
+    }
 
-	@Bean
-	RestAuthenticationFailureHandler authenticationFailureHandler() {
-		return new RestAuthenticationFailureHandler();
-	}
+    @Bean
+    RestAuthenticationEntryPoint authenticationEntryPoint() {
+    	return new RestAuthenticationEntryPoint();
+    }
 
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
+    @Bean
+    RestAuthenticationFailureHandler authenticationFailureHandler() {
+    	return new RestAuthenticationFailureHandler();
+    }
 
-	@Autowired
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// do NOT call super.configure()
-	}
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+    	return super.authenticationManagerBean();
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.csrf(csrf -> csrf.disable())
-			.authorizeRequests(authorize -> authorize
-				.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Swagger UI
-				.antMatchers("/h2-console/**").permitAll() // H2 Web Console
-				.antMatchers("/actuator/**").permitAll()
-				.mvcMatchers("/offers/**", "/targetSystems/**").hasAuthority(SCOPE_PREFIX + scope)
-				.anyRequest().authenticated()
-			)
-			.exceptionHandling()
-				.accessDeniedHandler(accessDeniedHandler())
-				.authenticationEntryPoint(authenticationEntryPoint()).and()
-			.sessionManagement(cust -> cust.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+    @Autowired
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    	// do NOT call super.configure()
+    }
 
-		BearerTokenAuthenticationFilter filter = new BearerTokenAuthenticationFilter(authenticationManagerBean());
-		filter.setAuthenticationFailureHandler(authenticationFailureHandler());
-		http.addFilterBefore(filter, BearerTokenAuthenticationFilter.class);
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+    	http
+    		.csrf(csrf -> csrf.disable())
+    		.authorizeRequests(authorize -> authorize
+    			.mvcMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll() // Swagger UI
+    			.antMatchers("/h2-console/**").permitAll() // H2 Web Console
+    			.antMatchers("/actuator/**").permitAll()
+    			.mvcMatchers("/offers/**").hasAuthority(SCOPE_PREFIX + offersScope)
+    			.mvcMatchers(GET, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + offersScope)
+    			.mvcMatchers(POST, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + targetScope)
+    			.mvcMatchers(DELETE, "/targetsystems/**").hasAuthority(SCOPE_PREFIX + targetScope)
+    			.anyRequest().authenticated()
+    		)
+    		.exceptionHandling()
+    			.accessDeniedHandler(accessDeniedHandler())
+    			.authenticationEntryPoint(authenticationEntryPoint()).and()
+    		.sessionManagement(cust -> cust.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    		.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
 
-		http.headers().frameOptions().disable(); // for H2 Web Console
+    	BearerTokenAuthenticationFilter filter = new BearerTokenAuthenticationFilter(authenticationManagerBean());
+    	filter.setAuthenticationFailureHandler(authenticationFailureHandler());
+    	http.addFilterBefore(filter, BearerTokenAuthenticationFilter.class);
+
+    	http.headers().frameOptions().disable(); // for H2 Web Console
     }
         /*
         http

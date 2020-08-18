@@ -24,9 +24,14 @@ public class TargetSystemService {
 	@Autowired
 	private OfferTargetStatusService offerTargetStatusService;
 
+	@Autowired
+	private AuthorizationService authorizationService;
+
 	public TargetSystem addTargetSystem(final TargetSystem targetSystem) {
+		String clientId = authorizationService.getClientId();
 		EntityTargetSystem entityTargetSystem = targetSystemConverter.apiToEntity(targetSystem);
 		removeIds(entityTargetSystem);
+		entityTargetSystem.setClientId(clientId);
 		EntityTargetSystem savedTargetSystem = targetSystemRepository.save(entityTargetSystem);
 		return targetSystemConverter.entityToApi(savedTargetSystem);
 	}
@@ -39,7 +44,8 @@ public class TargetSystemService {
 	}
 
 	public boolean deleteTargetSystem(final UUID id) {
-		Optional<EntityTargetSystem> entityTargetSystem = targetSystemRepository.findById(id);
+		String clientId = authorizationService.getClientId();
+		Optional<EntityTargetSystem> entityTargetSystem = targetSystemRepository.findByIdAndClientId(id, clientId);
 		if (entityTargetSystem.isPresent()) {
 			offerTargetStatusService.remove(entityTargetSystem.get());
 			targetSystemRepository.deleteById(id);

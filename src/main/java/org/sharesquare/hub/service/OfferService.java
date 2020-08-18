@@ -29,8 +29,12 @@ public class OfferService {
     @Autowired
     private OfferTargetStatusService offerTargetStatusService;
 
+    @Autowired
+    private AuthorizationService authorizationService;
+
 	public Offer getOffer(final UUID id) {
-		Optional<EntityOffer> entityOffer = offerRepository.findById(id);
+		String clientId = authorizationService.getClientId();
+		Optional<EntityOffer> entityOffer = offerRepository.findByIdAndClientId(id, clientId);
 		if (entityOffer.isPresent()) {
 			Offer offer = offerConverter.entityToApi(entityOffer.get());
 			return offer;
@@ -39,22 +43,25 @@ public class OfferService {
 	}
 
 	public Offer addOffer(final Offer offer) {
-		EntityOffer savedOffer = save(null, offer);
+		String clientId = authorizationService.getClientId();
+		EntityOffer savedOffer = save(null, offer, clientId);
 		offerTargetStatusService.init(savedOffer);
 		connectorService.addOffer(savedOffer);
 		return offerConverter.entityToApi(savedOffer);
 	}
 
 	public boolean updateOffer(final UUID id, final Offer offer) {
-		if (offerRepository.existsById(id)) {
-			save(id, offer);
+		String clientId = authorizationService.getClientId();
+		if (offerRepository.existsByIdAndClientId(id, clientId)) {
+			save(id, offer, clientId);
 			return true;
 		}
 		return false;
 	}
 
 	public Page<Offer> getOffers(final String userId, final Pageable pageable) {
-		Page<EntityOffer> entityOffers = offerRepository.findByUserId(userId, pageable);
+		String clientId = authorizationService.getClientId();
+		Page<EntityOffer> entityOffers = offerRepository.findByUserIdAndClientId(userId, clientId, pageable);
 		Page<Offer> offers = entityOffers.map(new Function<EntityOffer, Offer>() {
 			@Override
 			public Offer apply(EntityOffer entity) {
@@ -65,7 +72,8 @@ public class OfferService {
 	}
 
 	public boolean deleteOffer(final UUID id) {
-		Optional<EntityOffer> entityOffer = offerRepository.findById(id);
+		String clientId = authorizationService.getClientId();
+		Optional<EntityOffer> entityOffer = offerRepository.findByIdAndClientId(id, clientId);
 		if (entityOffer.isPresent()) {
 			offerTargetStatusService.remove(entityOffer.get());
 			offerRepository.deleteById(id);
@@ -74,11 +82,12 @@ public class OfferService {
 		return false;
 	}
 
-	private EntityOffer save(final UUID id, final Offer offer) {
+	private EntityOffer save(final UUID id, final Offer offer, final String clientId) {
 		EntityOffer entityOffer = offerConverter.apiToEntity(offer);
 		removeIds(entityOffer);
 		setPreferenceIds(entityOffer);
 		entityOffer.setId(id);
+		entityOffer.setClientId(clientId);
 		return offerRepository.save(entityOffer);
 	}
 

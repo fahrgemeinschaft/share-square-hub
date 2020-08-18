@@ -46,6 +46,24 @@ class RequestSpecification extends Specification {
 
 	@Value("\${custom.auth.server.client.secret}")
 	private clientSecret;
+	
+	@Value("\${custom.auth.server.client.id2}")
+	private clientId2;
+
+	@Value("\${custom.auth.server.client.secret2}")
+	private clientSecret2;
+	
+	@Value("\${custom.auth.server.client.in.target.scope.id}")
+	private clientInTargetScopeId;
+
+	@Value("\${custom.auth.server.client.in.target.scope.secret}")
+	private clientInTargetScopeSecret;
+
+	@Value("\${custom.auth.server.client.in.target.scope.id2}")
+	private clientInTargetScopeId2;
+
+	@Value("\${custom.auth.server.client.in.target.scope.secret2}")
+	private clientInTargetScopeSecret2;
 
 	@Value("\${custom.auth.server.client.not.in.scope.id}")
 	private clientNotInScopeId;
@@ -200,15 +218,27 @@ class RequestSpecification extends Specification {
 	def accessToken() {
 		authServerResponse().data.access_token
 	}
+	
+	def accessToken2() {
+		authServerResponse(clientId2, clientSecret2).data.access_token
+	}
+	
+	def accessTokenInTargetScope() {
+		authServerResponse(clientInTargetScopeId, clientInTargetScopeSecret).data.access_token
+	}
+
+	def accessTokenInTargetScope2() {
+		authServerResponse(clientInTargetScopeId2, clientInTargetScopeSecret2).data.access_token
+	}
 
 	def accessTokenNotInScope() {
 		authServerResponse(clientNotInScopeId, clientNotInScopeSecret).data.access_token
 	}
 
-	def doPost(uri, requestBody, mediaType = APPLICATION_JSON) {
+	def doPost(uri, requestBody, mediaType = APPLICATION_JSON, accessToken = accessToken()) {
 		mvc.perform(
 				post(uri)
-					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.header(AUTHORIZATION, "Bearer $accessToken")
 					.contentType(mediaType)
 					.content(requestBody)
 			)
@@ -265,20 +295,20 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
-	def doGet(uri) {
+	def doGet(uri, accessToken = accessToken()) {
 		mvc.perform(
 				get(uri)
-					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.header(AUTHORIZATION, "Bearer $accessToken")
 			)
 			.andDo(print())
 			.andReturn()
 			.response
 	}
 
-	def doGet(uri, name1, value1, name2 = ' ', value2 = '', name3 = ' ', value3 = '') {
+	def doGet(uri, name1, value1, name2 = ' ', value2 = '', name3 = ' ', value3 = '', accessToken = accessToken()) {
 		mvc.perform(
 				get(uri)
-					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.header(AUTHORIZATION, "Bearer $accessToken")
 					.param(name1, value1)
 					.param(name2, value2)
 					.param(name3, value3)
@@ -299,10 +329,10 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
-	def doPut(uri, requestBody, mediaType = APPLICATION_JSON) {
+	def doPut(uri, requestBody, mediaType = APPLICATION_JSON, accessToken = accessToken()) {
 		mvc.perform(
 				put(uri)
-					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.header(AUTHORIZATION, "Bearer $accessToken")
 					.contentType(mediaType)
 					.content(requestBody)
 			)
@@ -324,10 +354,10 @@ class RequestSpecification extends Specification {
 			.response
 	}
 
-	def doDelete(uri) {
+	def doDelete(uri, accessToken = accessToken()) {
 		mvc.perform(
 				delete(uri)
-					.header(AUTHORIZATION, "Bearer ${accessToken()}")
+					.header(AUTHORIZATION, "Bearer $accessToken")
 			)
 			.andDo(print())
 			.andReturn()

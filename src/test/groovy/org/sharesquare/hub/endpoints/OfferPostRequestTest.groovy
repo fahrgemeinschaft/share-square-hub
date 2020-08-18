@@ -3,9 +3,14 @@ package org.sharesquare.hub.endpoints
 import static org.sharesquare.hub.endpoints.OfferUtil.offersUri
 import static org.sharesquare.hub.endpoints.OfferUtil.targetSystemIds
 import static org.sharesquare.hub.endpoints.OfferUtil.userId
+import static org.sharesquare.hub.endpoints.OfferUtil.userIdExample
 import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.NOT_FOUND
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE
+import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
 import static org.springframework.http.MediaType.TEXT_XML
 
@@ -51,6 +56,68 @@ class OfferPostRequestTest extends RequestSpecification {
 			example | _
 			1       | _
 			2       | _
+	}
+
+	@Issue("#27")
+	def "Offer requests should only manage Offers from this client"() {
+		when:
+			String id1 = fromJson(doPost(offersUri, defaultOffer(), APPLICATION_JSON, accessToken()).contentAsString).id
+			String id2 = fromJson(doPost(offersUri, exampleOffer(), APPLICATION_JSON, accessToken2()).contentAsString).id
+
+		and:
+			def response1 = doGet("$offersUri/$id1", accessToken2())
+			def response2 = doGet("$offersUri/$id2", accessToken())
+			def response3 = doGet("$offersUri/$id1", accessToken())
+			def response4 = doGet("$offersUri/$id2", accessToken2())
+
+		then:
+			response1.status == NOT_FOUND.value
+			response2.status == NOT_FOUND.value
+			resultIs(response3, OK)
+			resultIs(response4, OK)
+
+		when:
+			response1 = doGet(offersUri, userId, userIdExample, ' ', '', ' ', '', accessToken())
+			response2 = doGet(offersUri, userId, userIdExample, ' ', '', ' ', '', accessToken2())
+
+		then:
+			resultIs(response1, OK)
+			resultIs(response2, OK)
+
+		when:
+			final responseOffers1 = fromJson(response1.contentAsString, Map)
+			final responseOffers2 = fromJson(response2.contentAsString, Map)
+
+		then:
+			responseOffers1.content.each {
+				assert it.id != id1
+			}
+			contentSizeIs(responseOffers2, 1)
+			responseOffers2.content[0].id == id2
+
+		when:
+			response1 = doPut("$offersUri/$id1", defaultOffer(), APPLICATION_JSON, accessToken2())
+			response2 = doPut("$offersUri/$id2", exampleOffer(), APPLICATION_JSON, accessToken())
+			response3 = doPut("$offersUri/$id1", defaultOffer(), APPLICATION_JSON, accessToken())
+			response4 = doPut("$offersUri/$id2", exampleOffer(), APPLICATION_JSON, accessToken2())
+
+		then:
+			response1.status == NOT_FOUND.value
+			response2.status == NOT_FOUND.value
+			response3.status == OK.value
+			response4.status == OK.value
+
+		when:
+			response1 = doDelete("$offersUri/$id1", accessToken2())
+			response2 = doDelete("$offersUri/$id2", accessToken())
+			response3 = doDelete("$offersUri/$id1", accessToken())
+			response4 = doDelete("$offersUri/$id2", accessToken2())
+
+		then:
+			response1.status == NOT_FOUND.value
+			response2.status == NOT_FOUND.value
+			response3.status == NO_CONTENT.value
+			response4.status == NO_CONTENT.value
 	}
 
 	def "A post request with an empty body should respond with status code 400 and a meaningful error message"() {

@@ -39,4 +39,7 @@ public class EntityTargetSystem extends BaseEntity {
 	private EntityConnector connector;
 
 	private boolean active;
+
+	@Column(name = "client_id")
+	private String clientId;
 }
