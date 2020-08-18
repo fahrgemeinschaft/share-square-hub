@@ -149,44 +149,51 @@ class RequestSpecification extends Specification {
 		    \"${targetSystemId1()}\",
 		    \"${targetSystemId2()}\"
 		  ],
-		  \"preferences\": [
- 		   {
-		      \"key\": \"string\",
-		      \"value\": true,
-		      \"type\": \"BooleanPreference\"
-		    },
- 		   {
- 		     \"key\": \"string\",
-		      \"value\": 0,
-		      \"type\": \"DoublePreference\"
-		    },
-		    {
-		      \"key\": \"string\",
-		      \"value\": 0,
-		      \"type\": \"IntegerPreference\"
-		    },
-		    {
-		      \"key\": \"string\",
-		      \"value\": \"MALE\",
-		      \"type\": \"PaxGenderPreference\"
-		    },
-		    {
-		      \"key\": \"string\",
-		      \"value\": \"PETS_OK\",
-		      \"type\": \"PaxPetsPreference\"
-		    },
-		    {
-		      \"key\": \"string\",
-		      \"value\": \"SMOKER\",
-		      \"type\": \"PaxSmokerPreference\"
-		    },
-		    {
-		      \"key\": \"string\",
-		      \"value\": \"string\",
-		      \"type\": \"StringPreference\"
-		    }
-		  ],
-		  "additionalInfo": "string"
+		  \"preferences\": {
+		    \"booleanPreferences\": [
+		      {
+		        \"key\": \"string\",
+		        \"value\": true
+		      }
+		    ],
+		    \"doublePreferences\": [
+		      {
+		        \"key\": \"string\",
+		        \"value\": 0
+		      }
+		    ],
+		    \"integerPreferences\": [
+		      {
+		        \"key\": \"string\",
+		        \"value\": 0
+		      }
+		    ],
+		    \"paxGenderPreferences\": [
+		      {
+		        \"key\": \"string\",
+		        \"value\": \"MALE\"
+		      }
+		    ],
+		    \"paxPetsPreferences\": [
+		      {
+		        \"key\": \"string\",
+		        \"value\": \"PETS_OK\"
+		      }
+		    ],
+		    \"paxSmokerPreferences\": [
+		      {
+		        \"key\": \"string\",
+		        \"value\": \"SMOKER\"
+		      }
+		    ],
+		    \"stringPreferences\": [
+		      {
+		        \"key\": \"string\",
+		        \"value\": \"string\"
+		      }
+		    ]
+		  },
+		  \"additionalInfo\": \"string\"
 		}
 		"""
 	}
