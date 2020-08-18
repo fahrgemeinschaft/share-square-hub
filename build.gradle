@@ -62,7 +62,7 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     
-    implementation 'org.sharesquare.commons:share-square-commons:0.0.4-SNAPSHOT'
+    implementation 'org.sharesquare.commons:share-square-commons:0.0.5-SNAPSHOT'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

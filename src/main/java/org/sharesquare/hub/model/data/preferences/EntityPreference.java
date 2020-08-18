@@ -1,4 +1,4 @@
-package org.sharesquare.hub.model.data;
+package org.sharesquare.hub.model.data.preferences;
 
 import java.util.UUID;
 

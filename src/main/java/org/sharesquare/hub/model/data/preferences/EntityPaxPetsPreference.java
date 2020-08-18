@@ -5,9 +5,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import org.sharesquare.hub.model.data.EntityPreference;
-import org.sharesquare.model.Preference;
 import org.sharesquare.model.preferences.PaxPetsValues;
+import org.sharesquare.model.preferences.Preference;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,10 +19,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "pax_pets_preference")
 public class EntityPaxPetsPreference extends EntityPreference<PaxPetsValues> {
 
-	public EntityPaxPetsPreference(Preference<?> preference) {
+	public EntityPaxPetsPreference(Preference<PaxPetsValues> preference) {
 		super.setId(preference.getId());
 		super.setKey(preference.getKey());
-		this.value = (PaxPetsValues) preference.getValue();
+		this.value = preference.getValue();
 	}
 
 	@Enumerated(EnumType.STRING)

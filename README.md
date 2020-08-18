@@ -22,13 +22,15 @@ Define authorization properties in the **application.properties** file:
 
 * custom.auth.server.domain
 * custom.auth.server.realm
-* custom.auth.server.scope
+* custom.auth.server.scope.offers
+* custom.auth.server.scope.target
 
 or use environment variables:
 
 * SHARE2_AUTH_SERVER_DOMAIN
 * SHARE2_AUTH_SERVER_REALM
-* SHARE2_AUTH_SERVER_SCOPE
+* SHARE2_AUTH_SERVER_SCOPE_OFFERS
+* SHARE2_AUTH_SERVER_SCOPE_TARGET
 
 Run **HubMain.java** or
 
