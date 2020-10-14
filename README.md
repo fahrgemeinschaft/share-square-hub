@@ -52,6 +52,8 @@ curl -H "Content-Type: application/x-www-form-urlencoded" \
 
 Authorize request with header `"Authorization: Bearer {access_token}"`
 
+[<img src="images/authorization.jpg" width="70%"/>](images/authorization.jpg)
+
 ### Datasource
 
 The Application runs with a H2 in-memory database. The database web console can be accessed at   [http://localhost:8080/h2-console](http://localhost:8080/h2-console).
