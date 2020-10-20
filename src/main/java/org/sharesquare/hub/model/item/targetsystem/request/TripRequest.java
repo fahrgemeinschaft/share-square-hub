@@ -24,8 +24,8 @@ public class TripRequest {
 	private TripType tripType = TripType.offer;
 
 	@JsonProperty("Enterdate")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
-	private LocalDate enterDateEpoch;
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	private long enterDateEpoch;
 
 	@JsonProperty("Startdate")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
@@ -77,7 +77,7 @@ public class TripRequest {
 	private List<TripRouting> routings;
 
 	@JsonProperty("Smoker")
-	private String Smoker;
+	private String smoker;
 
 	private String car;
 
@@ -111,8 +111,13 @@ public class TripRequest {
 	@JsonProperty("to_title")
 	private String toTitle;
 
+	public enum PrefGender {
+		woman,
+		man
+	}
+
 	@JsonProperty("Prefgender")
-	private String prefgender;
+	private PrefGender prefGender;
 
 	private String baggage;
 
