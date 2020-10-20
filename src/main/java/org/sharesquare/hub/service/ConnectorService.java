@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import org.sharesquare.hub.conversion.OfferConverter;
 import org.sharesquare.hub.conversion.TargetSystemTripConverter;
 import org.sharesquare.hub.model.data.EntityClient;
 import org.sharesquare.hub.model.data.EntityConnector;
@@ -31,7 +30,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class ConnectorService {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(ConnectorService.class);
 
     @Autowired
@@ -40,25 +39,22 @@ public class ConnectorService {
     @Autowired
     IRepository<ConnectorState> connectorStateRepo;
 
-	@Autowired
-	private TargetSystemTripConverter targetSystemTripConverter;
+    @Autowired
+    private TargetSystemTripConverter targetSystemTripConverter;
 
-	@Autowired
-	private TargetSystemService targetSystemService;
+    @Autowired
+    private TargetSystemService targetSystemService;
 
-	@Autowired
-	private OfferTargetStatusService offerTargetStatusService;
+    @Autowired
+    private WebClient webClient;
 
-	@Value("${custom.data.example.target.connector.client.name}")
-	private String exampleTargetConnectorClientName;
+    @Autowired
+    private OfferTargetStatusService offerTargetStatusService;
 
-  //  @Autowired
-   // WebClient oauthWebClient;
-	
-	@Autowired
-	OfferConverter offerConverter;
+    @Value("${custom.data.example.target.connector.client.name}")
+    private String exampleTargetConnectorClientName;
 
-	protected void addOffer(final EntityOffer entityOffer) {
+    protected void addOffer(final EntityOffer entityOffer) {
 		TripRequest trip = targetSystemTripConverter.entityToApi(entityOffer);
 		log.info("Target systems POST request for Trip instance '{}'", targetSystemTripConverter.apiToJSONString(trip));
 		List<EntityTargetSystem> targetSystems = targetSystemService.getEntityTargetSystems();
@@ -78,7 +74,7 @@ public class ConnectorService {
 							if (entityOffer.getClientId().equals(client.getName())) {
 								clientExists = true;
 								try {
-									response = WebClient.builder().build()
+									response = webClient
 											.post()
 											.uri(connector.getOfferUpdateWebhook())
 											.contentType(APPLICATION_JSON)
@@ -128,7 +124,7 @@ public class ConnectorService {
 		} else {
 			log.warn("No target systems");
 		}
-	}
+    }
     
     public void updateOffer(final Offer offer){
         /*
