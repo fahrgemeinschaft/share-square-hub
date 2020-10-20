@@ -78,10 +78,15 @@ public class ConnectorService {
 							if (entityOffer.getClientId().equals(client.getName())) {
 								clientExists = true;
 								try {
-									response = WebClient.builder().build().post().uri(connector.getOfferUpdateWebhook())
-											.contentType(APPLICATION_JSON).bodyValue(trip)
+									response = WebClient.builder().build()
+											.post()
+											.uri(connector.getOfferUpdateWebhook())
+											.contentType(APPLICATION_JSON)
+											.bodyValue(trip)
 											.header("apikey", connector.getApikey())
-											.header("authkey", client.getAuthkey()).exchange().block();
+											.header("authkey", client.getAuthkey())
+											.exchange()
+											.block();
 									if (response != null) {
 										log.info("Target system '{}' POST response status code: {}",
 												targetSystem.getName(), response.statusCode());
