@@ -97,6 +97,12 @@ class RequestSpecification extends Specification {
 		targetSystemId2 = (targetSystemId2 != null) ? targetSystemId2 : targetSystems()[2].id
 	}
 
+	private targetSystemId3
+
+	def targetSystemId3() {
+		targetSystemId3 = (targetSystemId3 != null) ? targetSystemId3 : targetSystems()[3].id
+	}
+
 	private defaultOffer
 
 	// berlin -> hamburg
