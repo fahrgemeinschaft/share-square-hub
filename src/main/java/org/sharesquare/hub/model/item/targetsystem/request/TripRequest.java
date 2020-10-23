@@ -76,8 +76,14 @@ public class TripRequest {
 	@JsonProperty("Routings")
 	private List<TripRouting> routings;
 
+	public enum Smoker {
+		yes,
+		no,
+		flex
+	}
+
 	@JsonProperty("Smoker")
-	private String smoker;
+	private Smoker smoker = Smoker.no;
 
 	private String car;
 
