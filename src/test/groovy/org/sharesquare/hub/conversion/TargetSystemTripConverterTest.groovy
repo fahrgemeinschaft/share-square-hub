@@ -88,7 +88,7 @@ class TargetSystemTripConverterTest extends RequestSpecification {
 		    },
 		    "RoutingIndex" : 0
 		  } ],
-		  "Smoker" : null,
+		  "Smoker" : "no",
 		  "Description" : "Hallo, ich werde mit einem Mietauto unterwegs sein",
 		  "NumberPlate" : null,
 		  "Contactlandline" : null,
